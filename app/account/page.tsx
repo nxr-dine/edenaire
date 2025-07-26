@@ -1,0 +1,813 @@
+"use client"
+
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Switch } from "@/components/ui/switch"
+import {
+  User,
+  Package,
+  Heart,
+  Settings,
+  Crown,
+  Diamond,
+  Star,
+  Download,
+  Eye,
+  Calendar,
+  Shield,
+  Bell,
+  LogOut,
+} from "lucide-react"
+import Image from "next/image"
+import Header from "@/components/header"
+import Footer from "@/components/footer"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
+import { signOut } from "next-auth/react"
+import useSWR from "swr"
+import { useToast } from "@/hooks/use-toast"
+import { PasswordChangeModal } from "@/components/password-change-modal"
+import { DeleteAccountModal } from "@/components/delete-account-modal"
+import { mutate } from "swr"
+
+const fetcher = (url: string) => fetch(url).then(res => res.json())
+
+// SWR configuration to prevent constant refetching
+const swrOptions = {
+  revalidateOnFocus: false,
+  revalidateOnReconnect: false,
+  dedupingInterval: 60000, // 1 minute
+  refreshInterval: 0, // No auto refresh
+}
+
+export default function AccountPage() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  const [activeTab, setActiveTab] = useState("overview")
+  const { toast } = useToast()
+
+  // Settings state
+  const [formData, setFormData] = useState({
+    firstName: "Isabella",
+    lastName: "Rodriguez",
+    email: "",
+    phone: "",
+    address: ""
+  })
+  const [notifications, setNotifications] = useState({
+    email: true,
+    sms: false,
+    marketing: true
+  })
+  const [isSaving, setIsSaving] = useState(false)
+
+  // Modal states
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/auth/login")
+    }
+  }, [status, router])
+
+  const { data: profile, isLoading: loadingProfile } = useSWR("/api/account", fetcher, swrOptions)
+  const { data: orders, isLoading: loadingOrders } = useSWR("/api/orders", fetcher, swrOptions)
+  const { data: wishlist, isLoading: loadingWishlist } = useSWR("/api/wishlist", fetcher, swrOptions)
+  const { data: subscriptionData, isLoading: loadingSubscription } = useSWR("/api/subscription", fetcher, swrOptions)
+
+  // Provide fallback data for orders and wishlist
+  const ordersData = orders || []
+  const wishlistData = wishlist || []
+  const subscription = subscriptionData?.subscription || null
+
+  // Update form data when profile loads
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        firstName: profile.firstName || "Isabella",
+        lastName: profile.lastName || "Rodriguez",
+        email: profile.email || "",
+        phone: profile.phone || "",
+        address: profile.address || ""
+      })
+    }
+  }, [profile])
+
+  // Settings handlers
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const handleNotificationToggle = (type: string) => {
+    setNotifications(prev => ({ ...prev, [type]: !prev[type as keyof typeof prev] }))
+  }
+
+  const handleSaveChanges = async () => {
+    setIsSaving(true)
+    try {
+      const response = await fetch("/api/account/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          personalInfo: formData,
+          notifications
+        })
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        toast({ title: "Settings saved successfully!" })
+      } else {
+        toast({ title: data.error || "Failed to save settings", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Failed to save settings", variant: "destructive" })
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleSecurityAction = (action: string) => {
+    switch (action) {
+      case "changePassword":
+        setIsPasswordModalOpen(true)
+        break
+      case "twoFactor":
+        toast({ title: "Two-factor authentication coming soon!" })
+        break
+      case "downloadData":
+        // Generate and download user data
+        const userData = {
+          profile: formData,
+          notifications,
+          orders: ordersData,
+          wishlist: wishlistData
+        }
+        const blob = new Blob([JSON.stringify(userData, null, 2)], { type: "application/json" })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = "account-data.json"
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+        toast({ title: "Account data downloaded!" })
+        break
+      case "deleteAccount":
+        setIsDeleteModalOpen(true)
+        break
+    }
+  }
+
+  // Subscription management functions
+  const handleUpgradeSubscription = async () => {
+    try {
+      const response = await fetch("/api/subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tier: "Ultra-Exclusive" })
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        toast({ title: "Successfully upgraded to Ultra-Exclusive!" })
+        // Refresh subscription data without triggering other refetches
+        mutate("/api/subscription", data, { revalidate: false })
+      } else {
+        toast({ title: data.error || "Failed to upgrade subscription", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Failed to upgrade subscription", variant: "destructive" })
+    }
+  }
+
+  const handleCancelSubscription = async () => {
+    if (!window.confirm("Are you sure you want to cancel your subscription? You'll lose access to premium benefits.")) {
+      return
+    }
+
+    try {
+      const response = await fetch("/api/subscription", {
+        method: "DELETE"
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        toast({ title: "Subscription cancelled successfully" })
+        // Refresh subscription data without triggering other refetches
+        mutate("/api/subscription", { subscription: { ...subscription, status: "cancelled" } }, { revalidate: false })
+      } else {
+        toast({ title: data.error || "Failed to cancel subscription", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Failed to cancel subscription", variant: "destructive" })
+    }
+  }
+
+  if (loadingProfile || loadingOrders || loadingWishlist || loadingSubscription) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">Loading account...</div>
+    )
+  }
+  if (!profile) {
+    return <div className="min-h-screen flex items-center justify-center text-gray-500">Account not found.</div>
+  }
+
+  if (status === "unauthenticated") {
+    return null
+  }
+
+  const getTierIcon = (tier: string) => {
+    switch (tier) {
+      case "Ultra-Exclusive":
+        return Crown
+      case "Prestige Collection":
+        return Diamond
+      default:
+        return Star
+    }
+  }
+
+  const getTierColorClasses = (color: string) => {
+    switch (color) {
+      case "yellow":
+        return "from-yellow-400 to-yellow-600"
+      case "purple":
+        return "from-purple-600 to-indigo-800"
+      default:
+        return "from-gray-400 to-gray-600"
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <div className="pt-20 sm:pt-24">
+        {/* Hero Section */}
+        <section className="bg-gradient-to-r from-gray-900 via-black to-gray-900 py-12 sm:py-16 px-4 sm:px-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center flex-shrink-0">
+                <User className="h-10 w-10 sm:h-12 sm:w-12 text-black" />
+              </div>
+              <div className="flex-1">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between">
+                  <div>
+                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extralight text-white mb-2">
+                      Welcome back, {profile.name}
+                    </h1>
+                    <p className="text-gray-300 mb-4">Member since {profile.memberSince}</p>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <Badge
+                        className={`bg-gradient-to-r ${getTierColorClasses(profile.tierColor)} text-white px-4 py-2 w-fit`}
+                      >
+                        <Diamond className="h-4 w-4 mr-2" />
+                        {profile.currentTier}
+                      </Badge>
+                      <div className="text-sm text-gray-300">
+                        Total Spent: <span className="text-yellow-400 font-medium">{profile.totalSpent}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                    className="mt-6 sm:mt-0 bg-yellow-500 text-black hover:bg-yellow-600 transition"
+                  >
+                    <LogOut className="mr-2" /> Logout
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Account Content */}
+        <section className="py-8 sm:py-12 px-4 sm:px-6">
+          <div className="max-w-7xl mx-auto">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 h-auto p-1 bg-white border">
+                <TabsTrigger value="overview" className="flex items-center gap-2 py-3 text-xs sm:text-sm">
+                  <User className="h-4 w-4" />
+                  <span className="hidden sm:inline">Overview</span>
+                </TabsTrigger>
+                <TabsTrigger value="orders" className="flex items-center gap-2 py-3 text-xs sm:text-sm">
+                  <Package className="h-4 w-4" />
+                  <span className="hidden sm:inline">Orders</span>
+                </TabsTrigger>
+                <TabsTrigger value="wishlist" className="flex items-center gap-2 py-3 text-xs sm:text-sm">
+                  <Heart className="h-4 w-4" />
+                  <span className="hidden sm:inline">Wishlist</span>
+                </TabsTrigger>
+                <TabsTrigger value="subscription" className="flex items-center gap-2 py-3 text-xs sm:text-sm">
+                  <Crown className="h-4 w-4" />
+                  <span className="hidden sm:inline">Subscription</span>
+                </TabsTrigger>
+                <TabsTrigger value="settings" className="flex items-center gap-2 py-3 text-xs sm:text-sm">
+                  <Settings className="h-4 w-4" />
+                  <span className="hidden sm:inline">Settings</span>
+                </TabsTrigger>
+              </TabsList>
+
+              {/* Overview Tab */}
+              <TabsContent value="overview" className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Quick Stats */}
+                  <div className="lg:col-span-2 space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <Card>
+                        <CardContent className="p-6 text-center">
+                          <Package className="h-8 w-8 text-yellow-600 mx-auto mb-3" />
+                          <div className="text-2xl font-light text-gray-900 mb-1">{ordersData.length}</div>
+                          <div className="text-sm text-gray-600">Total Orders</div>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardContent className="p-6 text-center">
+                          <Heart className="h-8 w-8 text-red-500 mx-auto mb-3" />
+                          <div className="text-2xl font-light text-gray-900 mb-1">{wishlistData.length}</div>
+                          <div className="text-sm text-gray-600">Wishlist Items</div>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardContent className="p-6 text-center">
+                          <Star className="h-8 w-8 text-yellow-500 mx-auto mb-3" />
+                          <div className="text-2xl font-light text-gray-900 mb-1">{profile.loyaltyPoints}</div>
+                          <div className="text-sm text-gray-600">Loyalty Points</div>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* Recent Orders */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Package className="h-5 w-5" />
+                          Recent Orders
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          {ordersData.length > 0 ? (
+                            ordersData.slice(0, 3).map((order) => (
+                              <div key={order.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                <div className="flex-1">
+                                  <div className="font-medium text-gray-900 mb-1">{order.id}</div>
+                                  <div className="text-sm text-gray-600 mb-2">{order.items.join(", ")}</div>
+                                  <div className="text-xs text-gray-500">{new Date(order.date).toLocaleDateString()}</div>
+                                </div>
+                                <div className="text-right">
+                                  <div className="font-medium text-gray-900 mb-2">{order.total}</div>
+                                  <Badge
+                                    className={`${
+                                      order.statusColor === "green"
+                                        ? "bg-green-100 text-green-800"
+                                        : order.statusColor === "blue"
+                                          ? "bg-blue-100 text-blue-800"
+                                          : "bg-yellow-100 text-yellow-800"
+                                    }`}
+                                  >
+                                    {order.status}
+                                  </Badge>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-center py-8 text-gray-500">
+                              <Package className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                              <p>No orders yet</p>
+                              <p className="text-sm">Start shopping to see your order history</p>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Tier Progress */}
+                  <div className="space-y-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Crown className="h-5 w-5" />
+                          Membership Progress
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-center mb-6">
+                          <div
+                            className={`w-16 h-16 mx-auto mb-4 bg-gradient-to-r ${getTierColorClasses(profile.tierColor)} rounded-full flex items-center justify-center`}
+                          >
+                            <Diamond className="h-8 w-8 text-white" />
+                          </div>
+                          <div className="font-medium text-gray-900 mb-1">{profile.currentTier}</div>
+                          <div className="text-sm text-gray-600">Current Tier</div>
+                        </div>
+
+                        <div className="mb-4">
+                          <div className="flex justify-between text-sm mb-2">
+                            <span>Progress to {profile.nextTier}</span>
+                            <span>{profile.tierProgress}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div
+                              className="bg-gradient-to-r from-yellow-400 to-yellow-600 h-2 rounded-full transition-all duration-500"
+                              style={{ width: `${profile.tierProgress}%` }}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="text-xs text-gray-600 text-center">
+                          Spend ${((200000 - profile.totalSpent) / 1000).toFixed(0)}k more to reach {profile.nextTier}
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Quick Actions */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Quick Actions</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <Button variant="outline" className="w-full justify-start bg-transparent">
+                          <Eye className="h-4 w-4 mr-2" />
+                          Track Orders
+                        </Button>
+                        <Button variant="outline" className="w-full justify-start bg-transparent">
+                          <Heart className="h-4 w-4 mr-2" />
+                          View Wishlist
+                        </Button>
+                        <Button variant="outline" className="w-full justify-start bg-transparent">
+                          <Calendar className="h-4 w-4 mr-2" />
+                          Book Consultation
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </TabsContent>
+
+              {/* Orders Tab */}
+              <TabsContent value="orders" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Order History</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {ordersData.length > 0 ? (
+                        ordersData.map((order) => (
+                          <div key={order.id} className="border border-gray-200 rounded-lg p-4 sm:p-6">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4">
+                              <div>
+                                <div className="font-medium text-gray-900 mb-1">{order.id}</div>
+                                <div className="text-sm text-gray-600">{new Date(order.date).toLocaleDateString()}</div>
+                              </div>
+                              <div className="flex items-center gap-3 mt-3 sm:mt-0">
+                                <Badge
+                                  className={`${
+                                    order.statusColor === "green"
+                                      ? "bg-green-100 text-green-800"
+                                      : order.statusColor === "blue"
+                                        ? "bg-blue-100 text-blue-800"
+                                        : "bg-yellow-100 text-yellow-800"
+                                  }`}
+                                >
+                                  {order.status}
+                                </Badge>
+                                <span className="font-medium text-gray-900">{order.total}</span>
+                              </div>
+                            </div>
+                            <div className="mb-4">
+                              <div className="text-sm text-gray-600 mb-2">Items:</div>
+                              <div className="text-gray-900">{order.items.join(", ")}</div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row gap-3">
+                              <Button variant="outline" size="sm">
+                                <Eye className="h-4 w-4 mr-2" />
+                                View Details
+                              </Button>
+                              <Button variant="outline" size="sm">
+                                <Download className="h-4 w-4 mr-2" />
+                                Download Receipt
+                              </Button>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center py-12 text-gray-500">
+                          <Package className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                          <h3 className="text-lg font-medium mb-2">No orders yet</h3>
+                          <p className="text-sm mb-4">Start shopping to see your order history</p>
+                          <Button
+                            className="bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black"
+                            onClick={() => router.push("/shop")}
+                          >
+                            Start Shopping
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Wishlist Tab */}
+              <TabsContent value="wishlist" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Heart className="h-5 w-5" />
+                      Your Wishlist ({wishlistData.length} items)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {wishlistData.length > 0 ? (
+                        wishlistData.map((item) => (
+                          <div key={item.id} className="border border-gray-200 rounded-lg p-4">
+                            <div className="relative h-32 mb-4 overflow-hidden rounded-lg">
+                              <Image
+                                src={item.image || "/placeholder.svg"}
+                                alt={item.name}
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                            <h3 className="font-medium text-gray-900 mb-2">{item.name}</h3>
+                            <p className="text-lg font-light text-gray-900 mb-4">{item.price}</p>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                className="flex-1 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black"
+                              >
+                                Add to Cart
+                              </Button>
+                              <Button variant="outline" size="sm">
+                                <Heart className="h-4 w-4 fill-current text-red-500" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="col-span-full text-center py-12 text-gray-500">
+                          <Heart className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                          <h3 className="text-lg font-medium mb-2">Your wishlist is empty</h3>
+                          <p className="text-sm mb-4">Start adding items to your wishlist</p>
+                          <Button className="bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black" onClick={() => router.push("/shop")}>
+                            Browse Collection
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Subscription Tab */}
+              <TabsContent value="subscription" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Crown className="h-5 w-5" />
+                      Membership Details
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      <div>
+                        <div className="text-center mb-6">
+                          <div
+                            className={`w-20 h-20 mx-auto mb-4 bg-gradient-to-r ${getTierColorClasses(profile.tierColor)} rounded-full flex items-center justify-center`}
+                          >
+                            <Diamond className="h-10 w-10 text-white" />
+                          </div>
+                          <h3 className="text-xl font-light text-gray-900 mb-2">
+                            {subscription?.tier || profile.currentTier || "No Active Subscription"}
+                          </h3>
+                          <p className="text-gray-600">
+                            {subscription?.tier === "Ultra-Exclusive" ? "$299/month" : "$199/month"}
+                          </p>
+                          {subscription && (
+                            <p className="text-sm text-gray-500 mt-1">
+                              Status: <span className={`font-medium ${subscription.status === "active" ? "text-green-600" : "text-red-600"}`}>
+                                {subscription.status}
+                              </span>
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="space-y-3 mb-6">
+                          <div className="flex items-center text-gray-700">
+                            <div className="w-2 h-2 bg-yellow-400 rounded-full mr-3" />
+                            <span className="text-sm">10% discount on all purchases</span>
+                          </div>
+                          <div className="flex items-center text-gray-700">
+                            <div className="w-2 h-2 bg-yellow-400 rounded-full mr-3" />
+                            <span className="text-sm">Priority customer service</span>
+                          </div>
+                          <div className="flex items-center text-gray-700">
+                            <div className="w-2 h-2 bg-yellow-400 rounded-full mr-3" />
+                            <span className="text-sm">Express shipping included</span>
+                          </div>
+                          <div className="flex items-center text-gray-700">
+                            <div className="w-2 h-2 bg-yellow-400 rounded-full mr-3" />
+                            <span className="text-sm">Early access to new collections</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-4">Billing Information</h4>
+                        <div className="space-y-3 mb-6">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Next billing date:</span>
+                            <span className="text-gray-900">
+                              {subscription?.renewedAt 
+                                ? new Date(new Date(subscription.renewedAt).getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()
+                                : "N/A"
+                              }
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Payment method:</span>
+                            <span className="text-gray-900">•••• •••• •••• 4242</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Amount:</span>
+                            <span className="text-gray-900">
+                              {subscription?.tier === "Ultra-Exclusive" ? "$299.00" : "$199.00"}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-3">
+                          {!subscription || subscription.status !== "active" ? (
+                            <Button
+                              className="w-full bg-gradient-to-r from-purple-600 to-indigo-800 hover:from-purple-500 hover:to-indigo-700 text-white"
+                              onClick={handleUpgradeSubscription}
+                            >
+                              Subscribe to Ultra-Exclusive
+                            </Button>
+                          ) : subscription.tier !== "Ultra-Exclusive" ? (
+                            <Button
+                              className="w-full bg-gradient-to-r from-purple-600 to-indigo-800 hover:from-purple-500 hover:to-indigo-700 text-white"
+                              onClick={handleUpgradeSubscription}
+                            >
+                              Upgrade to Ultra-Exclusive
+                            </Button>
+                          ) : (
+                            <Button
+                              className="w-full bg-green-600 hover:bg-green-700 text-white"
+                              disabled
+                            >
+                              Already Ultra-Exclusive
+                            </Button>
+                          )}
+                          <Button
+                            variant="outline"
+                            className="w-full bg-transparent"
+                            onClick={() => toast({ title: "Update Payment Method (demo)" })}
+                          >
+                            Update Payment Method
+                          </Button>
+                          {subscription?.status === "active" && (
+                            <Button
+                              variant="outline"
+                              className="w-full text-red-600 hover:text-red-700 bg-transparent"
+                              onClick={handleCancelSubscription}
+                            >
+                              Cancel Subscription
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Settings Tab */}
+              <TabsContent value="settings" className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Personal Information */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Personal Information</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="firstName">First Name</Label>
+                          <Input id="firstName" value={formData.firstName} onChange={(e) => handleInputChange("firstName", e.target.value)} />
+                        </div>
+                        <div>
+                          <Label htmlFor="lastName">Last Name</Label>
+                          <Input id="lastName" value={formData.lastName} onChange={(e) => handleInputChange("lastName", e.target.value)} />
+                        </div>
+                      </div>
+                      <div>
+                        <Label htmlFor="email">Email</Label>
+                        <Input id="email" type="email" value={formData.email} onChange={(e) => handleInputChange("email", e.target.value)} />
+                      </div>
+                      <div>
+                        <Label htmlFor="phone">Phone</Label>
+                        <Input id="phone" value={formData.phone} onChange={(e) => handleInputChange("phone", e.target.value)} />
+                      </div>
+                      <div>
+                        <Label htmlFor="address">Address</Label>
+                        <Textarea id="address" value={formData.address} onChange={(e) => handleInputChange("address", e.target.value)} />
+                      </div>
+                      <Button onClick={handleSaveChanges} disabled={isSaving} className="bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black">
+                        {isSaving ? "Saving..." : "Save Changes"}
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  {/* Preferences & Security */}
+                  <div className="space-y-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Bell className="h-5 w-5" />
+                          Notifications
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-medium">Email Notifications</div>
+                            <div className="text-sm text-gray-600">
+                              Receive updates about orders and new collections
+                            </div>
+                          </div>
+                          <Switch checked={notifications.email} onCheckedChange={() => handleNotificationToggle("email")} />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-medium">SMS Notifications</div>
+                            <div className="text-sm text-gray-600">Get text updates for order status</div>
+                          </div>
+                          <Switch checked={notifications.sms} onCheckedChange={() => handleNotificationToggle("sms")} />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-medium">Marketing Communications</div>
+                            <div className="text-sm text-gray-600">Exclusive offers and event invitations</div>
+                          </div>
+                          <Switch checked={notifications.marketing} onCheckedChange={() => handleNotificationToggle("marketing")} />
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Shield className="h-5 w-5" />
+                          Security
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <Button variant="outline" className="w-full justify-start bg-transparent" onClick={() => handleSecurityAction("changePassword")}>
+                          Change Password
+                        </Button>
+                        <Button variant="outline" className="w-full justify-start bg-transparent" onClick={() => handleSecurityAction("twoFactor")}>
+                          Enable Two-Factor Authentication
+                        </Button>
+                        <Button variant="outline" className="w-full justify-start bg-transparent" onClick={() => handleSecurityAction("downloadData")}>
+                          Download Account Data
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start text-red-600 hover:text-red-700 bg-transparent"
+                          onClick={() => handleSecurityAction("deleteAccount")}
+                        >
+                          Delete Account
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </section>
+      </div>
+
+      <Footer />
+      <PasswordChangeModal isOpen={isPasswordModalOpen} onClose={() => setIsPasswordModalOpen(false)} />
+      <DeleteAccountModal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} />
+    </div>
+  )
+}

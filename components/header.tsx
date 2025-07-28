@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +19,9 @@ import { Search, ShoppingBag, User, Menu, X, Heart, LogIn, LogOut, Settings, Pac
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
+import useSWR from "swr"
 
+const fetcher = (url: string) => fetch(url).then(res => res.json())
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -30,6 +32,9 @@ export default function Header() {
   const searchRef = useRef<HTMLDivElement>(null)
   const { user, isAuthenticated, logout } = useAuth()
 
+  // Fetch cart data for dynamic cart count
+  const { data: cart } = useSWR(isAuthenticated ? "/api/cart" : null, fetcher)
+  const cartItemCount = cart?.items?.length || 0
 
   useEffect(() => {
     const handleScroll = () => {
@@ -179,7 +184,6 @@ export default function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="text-gray-700 hover:text-yellow-600 p-1">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.avatar || "/placeholder.svg"} alt={user?.name} />
                       <AvatarFallback className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black text-sm">
                         {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || "U"}
                       </AvatarFallback>
@@ -235,9 +239,11 @@ export default function Header() {
             <Link href="/cart">
               <Button variant="ghost" size="sm" className="text-gray-700 hover:text-yellow-600 relative p-2">
                 <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5" />
-                <Badge className="absolute -top-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 p-0 bg-yellow-500 text-black text-xs flex items-center justify-center font-bold">
-                  2
-                </Badge>
+                {cartItemCount > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 p-0 bg-yellow-500 text-black text-xs flex items-center justify-center font-bold">
+                    {cartItemCount > 99 ? "99+" : cartItemCount}
+                  </Badge>
+                )}
               </Button>
             </Link>
           </div>
@@ -324,7 +330,6 @@ export default function Header() {
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="sm" className="text-gray-700 p-1">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={user?.avatar || "/placeholder.svg"} alt={user?.name} />
                           <AvatarFallback className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black text-sm">
                             {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || "U"}
                           </AvatarFallback>
@@ -393,7 +398,11 @@ export default function Header() {
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <ShoppingBag className="h-5 w-5" />
-                    <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 bg-yellow-500 text-black text-xs flex items-center justify-center font-bold">2</Badge>
+                    {cartItemCount > 0 && (
+                      <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 bg-yellow-500 text-black text-xs flex items-center justify-center font-bold">
+                        {cartItemCount > 99 ? "99+" : cartItemCount}
+                      </Badge>
+                    )}
                   </Button>
                 </Link>
               </div>

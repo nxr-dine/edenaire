@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Star, Heart, ShoppingBag, Shield, Truck, RotateCcw, Award, Diamond, Crown, Sparkles } from "lucide-react"
+import { Heart, ShoppingBag, Shield, Truck, RotateCcw, Award, Diamond, Crown, Sparkles } from "lucide-react"
 import Image from "next/image"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
@@ -18,8 +18,7 @@ export default function CelestialDiamondNecklacePage() {
     name: "Celestial Diamond Necklace",
     price: 45000,
     originalPrice: 52000,
-    rating: 5,
-    reviews: 24,
+    
     badge: "Limited Edition",
     sku: "EDN-CEL-001",
     description:
@@ -81,35 +80,7 @@ export default function CelestialDiamondNecklacePage() {
     },
   ]
 
-  const reviews = [
-    {
-      name: "Victoria Ashworth",
-      rating: 5,
-      date: "December 2023",
-      comment:
-        "This necklace is absolutely breathtaking. The celestial cut creates the most incredible sparkle I've ever seen. It's become my signature piece for special occasions.",
-      verified: true,
-      location: "London",
-    },
-    {
-      name: "Isabella Rothschild",
-      rating: 5,
-      date: "November 2023",
-      comment:
-        "The craftsmanship is extraordinary. You can feel the quality and attention to detail in every aspect. The constellation pattern is pure artistry.",
-      verified: true,
-      location: "Geneva",
-    },
-    {
-      name: "Catherine Beaumont",
-      rating: 5,
-      date: "October 2023",
-      comment:
-        "I've collected jewelry for 20 years, and this piece stands out as truly exceptional. The way it catches light is mesmerizing.",
-      verified: true,
-      location: "Monaco",
-    },
-  ]
+
 
   return (
     <div className="min-h-screen bg-white">
@@ -152,12 +123,7 @@ export default function CelestialDiamondNecklacePage() {
               <Badge className="bg-yellow-500 text-black mb-4 px-4 py-2 text-sm font-medium tracking-wide">
                 LIMITED EDITION • ONLY 50 PIECES
               </Badge>
-              <div className="flex items-center space-x-2 mb-4">
-                {[...Array(product.rating)].map((_, i) => (
-                  <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                ))}
-                <span className="text-gray-300">({product.reviews} reviews)</span>
-              </div>
+
             </div>
 
             <h1 className="text-6xl md:text-7xl font-extralight mb-6 tracking-wider bg-gradient-to-r from-white via-yellow-200 to-white bg-clip-text text-transparent">
@@ -336,48 +302,7 @@ export default function CelestialDiamondNecklacePage() {
         </div>
       </section>
 
-      {/* Reviews Section */}
-      <section className="py-32 px-6 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-5xl font-extralight mb-8 text-gray-900 tracking-wide">Client Testimonials</h2>
-            <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-yellow-500 to-transparent mx-auto mb-8" />
-            <div className="flex items-center justify-center space-x-2 mb-4">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="h-6 w-6 fill-yellow-400 text-yellow-400" />
-              ))}
-              <span className="text-2xl font-light text-gray-900 ml-4">5.0</span>
-            </div>
-            <p className="text-lg text-gray-600 font-light">Based on {product.reviews} verified reviews</p>
-          </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
-            {reviews.map((review, index) => (
-              <Card key={index} className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500">
-                <CardContent className="p-8">
-                  <div className="flex items-center mb-6">
-                    {[...Array(review.rating)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-gray-700 mb-6 leading-relaxed font-light italic">"{review.comment}"</p>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium text-gray-900">{review.name}</h4>
-                      <p className="text-sm text-gray-500">
-                        {review.location} • {review.date}
-                      </p>
-                    </div>
-                    {review.verified && (
-                      <Badge className="bg-green-100 text-green-800 text-xs">Verified Purchase</Badge>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Complete the Collection */}
       <section className="py-32 px-6 bg-black">

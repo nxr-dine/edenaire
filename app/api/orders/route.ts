@@ -13,13 +13,23 @@ export async function GET(req: Request) {
   try {
     const user = await prisma.user.findUnique({ where: { email: session.user.email } })
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 })
+    
     const orders = await prisma.order.findMany({
       where: { userId: user.id },
-      include: { items: { include: { product: true } } },
+      include: { 
+        items: { 
+          include: { 
+            product: {
+              include: { category: true }
+            } 
+          } 
+        } 
+      },
       orderBy: { createdAt: "desc" },
     })
     return NextResponse.json(orders)
   } catch (error) {
+    console.error("Orders fetch error:", error)
     return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 })
   }
 }
@@ -32,32 +42,76 @@ export async function POST(req: Request) {
   try {
     const user = await prisma.user.findUnique({ where: { email: session.user.email } })
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 })
+    
     const cart = await prisma.cart.findUnique({
       where: { userId: user.id },
-      include: { items: true },
+      include: { 
+        items: {
+          include: { product: true }
+        } 
+      },
     })
+    
     if (!cart || !cart.items.length) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 })
     }
-    const order = await prisma.order.create({
-      data: {
-        userId: user.id,
-        total: cart.items.reduce((sum, item) => sum + item.quantity * (item.productPrice || 0), 0),
-        status: "pending",
-        items: {
-          create: cart.items.map((item) => ({
-            productId: item.productId,
-            quantity: item.quantity,
-            price: item.productPrice || 0,
-          })),
+    
+    // Validate all products still exist and have valid prices
+    for (const item of cart.items) {
+      if (!item.product) {
+        return NextResponse.json({ 
+          error: `Product ${item.productId} no longer exists` 
+        }, { status: 400 })
+      }
+      
+      if (item.productPrice <= 0) {
+        return NextResponse.json({ 
+          error: `Invalid price for product ${item.product.name}` 
+        }, { status: 400 })
+      }
+    }
+    
+    // Calculate total
+    const total = cart.items.reduce((sum, item) => {
+      return sum + (item.quantity * (item.productPrice || 0))
+    }, 0)
+    
+    if (total <= 0) {
+      return NextResponse.json({ error: "Order total must be greater than 0" }, { status: 400 })
+    }
+    
+    // Create order with transaction
+    const order = await prisma.$transaction(async (tx) => {
+      // Create the order
+      const newOrder = await tx.order.create({
+        data: {
+          userId: user.id,
+          total,
+          status: "pending",
+          items: {
+            create: cart.items.map((item) => ({
+              productId: item.productId,
+              quantity: item.quantity,
+              price: item.productPrice || 0,
+            })),
+          },
         },
-      },
-      include: { items: true },
+        include: { 
+          items: {
+            include: { product: { include: { category: true } } }
+          } 
+        },
+      })
+      
+      // Clear the cart
+      await tx.cartItem.deleteMany({ where: { cartId: cart.id } })
+      
+      return newOrder
     })
-    // Clear the cart
-    await prisma.cartItem.deleteMany({ where: { cartId: cart.id } })
+    
     return NextResponse.json(order, { status: 201 })
   } catch (error) {
+    console.error("Order creation error:", error)
     return NextResponse.json({ error: "Failed to place order" }, { status: 500 })
   }
 } 

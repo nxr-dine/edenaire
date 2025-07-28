@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Star, Heart, ShoppingBag, Shield, Truck, RotateCcw, Award, Gem, Crown, Sparkles } from "lucide-react"
+import { Heart, ShoppingBag, Shield, Truck, RotateCcw, Award, Gem, Crown, Sparkles } from "lucide-react"
 import Image from "next/image"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
@@ -18,8 +18,7 @@ export default function RoyalSapphireRingPage() {
     name: "Royal Sapphire Ring",
     price: 35800,
     originalPrice: 42000,
-    rating: 5,
-    reviews: 18,
+    
     badge: "Exclusive",
     sku: "EDR-ROY-004",
     description:
@@ -131,12 +130,7 @@ export default function RoyalSapphireRingPage() {
               <Badge className="bg-blue-600 text-white mb-4 px-4 py-2 text-sm font-medium tracking-wide">
                 EXCLUSIVE • GÜBELIN CERTIFIED
               </Badge>
-              <div className="flex items-center space-x-2 mb-4">
-                {[...Array(product.rating)].map((_, i) => (
-                  <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                ))}
-                <span className="text-gray-300">({product.reviews} reviews)</span>
-              </div>
+
             </div>
 
             <h1 className="text-6xl md:text-7xl font-extralight mb-6 tracking-wider bg-gradient-to-r from-white via-blue-200 to-white bg-clip-text text-transparent">

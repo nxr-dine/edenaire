@@ -340,13 +340,7 @@ export default function AccountPage() {
                           <div className="text-sm text-gray-600">Wishlist Items</div>
                         </CardContent>
                       </Card>
-                      <Card>
-                        <CardContent className="p-6 text-center">
-                          <Star className="h-8 w-8 text-yellow-500 mx-auto mb-3" />
-                          <div className="text-2xl font-light text-gray-900 mb-1">{profile.loyaltyPoints}</div>
-                          <div className="text-sm text-gray-600">Loyalty Points</div>
-                        </CardContent>
-                      </Card>
+
                     </div>
 
                     {/* Recent Orders */}

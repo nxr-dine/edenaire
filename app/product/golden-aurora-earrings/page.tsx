@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Star, Heart, ShoppingBag, Shield, Truck, RotateCcw, Award, Gem, Sun, Sparkles } from "lucide-react"
+import { Heart, ShoppingBag, Shield, Truck, RotateCcw, Award, Gem, Sun, Sparkles } from "lucide-react"
 import Image from "next/image"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
@@ -17,8 +17,7 @@ export default function GoldenAuroraEarringsPage() {
     name: "Golden Aurora Earrings",
     price: 18200,
     originalPrice: 21500,
-    rating: 5,
-    reviews: 32,
+    
     badge: "New Arrival",
     sku: "EDE-AUR-003",
     description:
@@ -111,12 +110,7 @@ export default function GoldenAuroraEarringsPage() {
               <Badge className="bg-gradient-to-r from-orange-500 to-pink-500 text-white mb-4 px-4 py-2 text-sm font-medium tracking-wide">
                 NEW ARRIVAL • AURORA CUT
               </Badge>
-              <div className="flex items-center space-x-2 mb-4">
-                {[...Array(product.rating)].map((_, i) => (
-                  <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                ))}
-                <span className="text-gray-300">({product.reviews} reviews)</span>
-              </div>
+
             </div>
 
             <h1 className="text-6xl md:text-7xl font-extralight mb-6 tracking-wider bg-gradient-to-r from-white via-orange-200 to-pink-200 bg-clip-text text-transparent">

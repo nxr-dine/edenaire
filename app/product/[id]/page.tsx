@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Star, Heart, ShoppingBag, Share2, Shield, Truck, RotateCcw, Award } from "lucide-react"
+import { Heart, ShoppingBag, Share2, Shield, Truck, RotateCcw, Award } from "lucide-react"
 import Image from "next/image"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
@@ -73,12 +73,6 @@ export default function ProductPage() {
           {/* Product Details */}
           <div className="space-y-6">
             <div>
-              <div className="flex items-center mb-2">
-                {[...Array(product.rating)].map((_, i) => (
-                  <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                ))}
-                <span className="ml-2 text-gray-600">({product.reviews} reviews)</span>
-              </div>
               <h1 className="text-3xl lg:text-4xl font-light mb-4 text-gray-900">{product.name}</h1>
               <div className="flex items-center gap-4 mb-6">
                 <span className="text-3xl font-light text-gray-900">${product.price.toLocaleString()}</span>
@@ -180,9 +174,8 @@ export default function ProductPage() {
         <div className="mt-16">
           <Tabs defaultValue="specifications" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="specifications">Specifications</TabsTrigger>
-              <TabsTrigger value="care">Care Instructions</TabsTrigger>
-              <TabsTrigger value="reviews">Reviews</TabsTrigger>
+                              <TabsTrigger value="specifications">Specifications</TabsTrigger>
+                <TabsTrigger value="care">Care Instructions</TabsTrigger>
             </TabsList>
 
             <TabsContent value="specifications" className="mt-8">
@@ -218,59 +211,7 @@ export default function ProductPage() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="reviews" className="mt-8">
-              <Card>
-                <CardContent className="p-6">
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-medium">Customer Reviews</h3>
-                      <div className="flex items-center">
-                        <div className="flex items-center mr-2">
-                          {[...Array(5)].map((_, i) => (
-                            <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          ))}
-                        </div>
-                        <span className="text-gray-600">5.0 out of 5 ({product.reviews} reviews)</span>
-                      </div>
-                    </div>
 
-                    <div className="space-y-4">
-                      <div className="border-b border-gray-100 pb-4">
-                        <div className="flex items-center mb-2">
-                          <div className="flex items-center mr-3">
-                            {[...Array(5)].map((_, i) => (
-                              <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            ))}
-                          </div>
-                          <span className="font-medium">Sarah M.</span>
-                          <span className="text-gray-500 ml-2">Verified Purchase</span>
-                        </div>
-                        <p className="text-gray-600">
-                          "Absolutely stunning piece. The craftsmanship is impeccable and it's even more beautiful in
-                          person. The customer service was exceptional throughout the entire process."
-                        </p>
-                      </div>
-
-                      <div className="border-b border-gray-100 pb-4">
-                        <div className="flex items-center mb-2">
-                          <div className="flex items-center mr-3">
-                            {[...Array(5)].map((_, i) => (
-                              <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            ))}
-                          </div>
-                          <span className="font-medium">Michael R.</span>
-                          <span className="text-gray-500 ml-2">Verified Purchase</span>
-                        </div>
-                        <p className="text-gray-600">
-                          "Purchased this as an anniversary gift. My wife was speechless. The quality and attention to
-                          detail is exactly what you'd expect from Edenaire. Worth every penny."
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
           </Tabs>
         </div>
 

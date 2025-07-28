@@ -8,13 +8,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { MapPin, Phone, Mail, Clock, Calendar, MessageCircle } from "lucide-react"
+import { MapPin, Phone, Mail, Clock, Calendar, MessageCircle, Loader2, CheckCircle } from "lucide-react"
 import Image from "next/image"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { ClientOnly } from "@/components/client-only"
+import { useToast } from "@/hooks/use-toast"
 
 export default function ContactPage() {
+  const { toast } = useToast()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -23,10 +28,52 @@ export default function ContactPage() {
     message: "",
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission
-    console.log("Form submitted:", formData)
+    setIsSubmitting(true)
+    
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setIsSubmitted(true)
+        toast({
+          title: "Message sent successfully!",
+          description: "We'll get back to you within 24-48 hours.",
+        })
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          service: "",
+          message: "",
+        })
+      } else {
+        toast({
+          title: "Failed to send message",
+          description: data.error || "Please try again.",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error('Contact form error:', error)
+      toast({
+        title: "Failed to send message",
+        description: "Please check your connection and try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const services = [
@@ -97,6 +144,22 @@ export default function ContactPage() {
                 <CardTitle className="text-xl font-medium">Send us a Message</CardTitle>
               </CardHeader>
               <CardContent>
+                {isSubmitted ? (
+                  <div className="text-center py-8">
+                    <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+                    <h3 className="text-xl font-medium text-gray-900 mb-2">Message Sent Successfully!</h3>
+                    <p className="text-gray-600 mb-6">
+                      Thank you for contacting us. We'll get back to you within 24-48 hours.
+                    </p>
+                    <Button
+                      onClick={() => setIsSubmitted(false)}
+                      variant="outline"
+                      className="border-yellow-500 text-yellow-600 hover:bg-yellow-50"
+                    >
+                      Send Another Message
+                    </Button>
+                  </div>
+                ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
@@ -163,11 +226,25 @@ export default function ContactPage() {
                   <Button
                     type="submit"
                     size="lg"
+                    disabled={isSubmitting}
                     className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black py-3"
                   >
-                    Send Message
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Sending...
+                      </>
+                    ) : isSubmitted ? (
+                      <>
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Message Sent!
+                      </>
+                    ) : (
+                      'Send Message'
+                    )}
                   </Button>
                 </form>
+                )}
               </CardContent>
             </Card>
           </div>

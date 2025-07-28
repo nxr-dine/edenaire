@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react"
+import { Quote, ChevronLeft, ChevronRight } from "lucide-react"
 import Image from "next/image"
 
 export default function TestimonialCarousel() {
@@ -17,7 +17,6 @@ export default function TestimonialCarousel() {
       image: "/placeholder.svg?height=80&width=80",
       quote:
         "Edenaire doesn't just create jewelry; they craft dreams into reality. Each piece I own tells a story of unparalleled artistry.",
-      rating: 5,
       location: "Geneva",
       product: "Celestial Diamond Collection",
     },
@@ -28,7 +27,6 @@ export default function TestimonialCarousel() {
       image: "/placeholder.svg?height=80&width=80",
       quote:
         "The attention to detail and craftsmanship is extraordinary. My wife's anniversary gift from Edenaire exceeded all expectations.",
-      rating: 5,
       location: "London",
       product: "Heritage Sapphire Ring",
     },
@@ -39,7 +37,6 @@ export default function TestimonialCarousel() {
       image: "/placeholder.svg?height=80&width=80",
       quote:
         "As someone who appreciates fine craftsmanship, Edenaire's work is simply incomparable. True luxury in every detail.",
-      rating: 5,
       location: "New York",
       product: "Bespoke Emerald Necklace",
     },
@@ -50,7 +47,6 @@ export default function TestimonialCarousel() {
       image: "/placeholder.svg?height=80&width=80",
       quote:
         "Edenaire understands that jewelry is art. Each piece in my collection represents the pinnacle of luxury and sophistication.",
-      rating: 5,
       location: "Milan",
       product: "Limited Edition Watch",
     },
@@ -61,7 +57,6 @@ export default function TestimonialCarousel() {
       image: "/placeholder.svg?height=80&width=80",
       quote:
         "The personal service and attention to detail is remarkable. Edenaire creates pieces that become family treasures.",
-      rating: 5,
       location: "Paris",
       product: "Diamond Tennis Bracelet",
     },
@@ -154,11 +149,7 @@ export default function TestimonialCarousel() {
                     </div>
                   </div>
 
-                  <div className="flex items-center mb-6">
-                    {[...Array(testimonials[currentSlide].rating)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
+
 
                   <Quote className="h-12 w-12 text-yellow-400 mb-6" />
                   <p className="text-white text-lg leading-relaxed font-light mb-6">

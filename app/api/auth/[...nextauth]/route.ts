@@ -26,7 +26,7 @@ export const authOptions = {
         if (!user || !user.password) return null
         const isValid = await compare(credentials.password, user.password)
         if (!isValid) return null
-        return { id: user.id, email: user.email, name: user.name, image: user.image }
+        return { id: user.id, email: user.email, name: user.name }
       },
     }),
   ],

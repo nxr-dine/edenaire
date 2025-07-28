@@ -1,24 +1,43 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
-import { Shield, Truck, Lock, CreditCard, Smartphone, Apple, CheckCircle, ArrowLeft } from "lucide-react"
+import { Shield, Truck, Lock, CreditCard, Smartphone, Apple, CheckCircle, ArrowLeft, Loader2 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
+import { ClientOnly } from "@/components/client-only"
 import useSWR from "swr"
+import StripePaymentForm from "@/components/payment/StripePaymentForm"
+import { useRouter } from "next/navigation"
+import { toast } from "react-hot-toast"
 
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
 export default function CheckoutPage() {
   const [step, setStep] = useState(1)
   const [paymentMethod, setPaymentMethod] = useState("card")
+  const [shippingData, setShippingData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "",
+  })
+  const [clientSecret, setClientSecret] = useState<string | null>(null)
+  const [orderId, setOrderId] = useState<string | null>(null)
+  const [isProcessing, setIsProcessing] = useState(false)
+  const router = useRouter()
 
   const { data: cart, isLoading } = useSWR("/api/cart", fetcher)
   const cartItems = cart?.items?.map((item: any) => ({
@@ -33,13 +52,90 @@ export default function CheckoutPage() {
   const tax = subtotal * 0.08 // 8% tax
   const total = subtotal + shipping + tax
 
+  const handleShippingSubmit = async () => {
+    if (!shippingData.firstName || !shippingData.lastName || !shippingData.email || 
+        !shippingData.phone || !shippingData.address || !shippingData.city || 
+        !shippingData.state || !shippingData.zipCode || !shippingData.country) {
+      toast.error("Please fill in all required fields")
+      return
+    }
+    setStep(2)
+  }
+
+  const handlePaymentMethodSelect = (method: string) => {
+    setPaymentMethod(method)
+    if (method === "card") {
+      createOrderAndPaymentIntent()
+    }
+  }
+
+  const createOrderAndPaymentIntent = async () => {
+    try {
+      setIsProcessing(true)
+      
+      // Create order
+      const orderResponse = await fetch("/api/orders/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          shippingAddress: shippingData,
+          billingAddress: shippingData,
+        }),
+      })
+
+      if (!orderResponse.ok) {
+        throw new Error("Failed to create order")
+      }
+
+      const orderData = await orderResponse.json()
+      setOrderId(orderData.orderId)
+
+      // Create payment intent
+      const paymentResponse = await fetch("/api/payment/create-payment-intent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderId: orderData.orderId,
+          amount: total,
+          currency: "usd",
+        }),
+      })
+
+      if (!paymentResponse.ok) {
+        throw new Error("Failed to create payment intent")
+      }
+
+      const paymentData = await paymentResponse.json()
+      setClientSecret(paymentData.clientSecret)
+    } catch (error) {
+      console.error("Error creating order:", error)
+      toast.error("Failed to process payment. Please try again.")
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  const handlePaymentSuccess = (paymentIntent: any) => {
+    toast.success("Payment successful!")
+    setStep(3)
+  }
+
+  const handlePaymentError = (error: string) => {
+    toast.error(error)
+  }
+
   if (isLoading) {
     return <div className="text-center py-16 text-gray-500">Loading cart...</div>
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <Header />
+    <ClientOnly>
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+        <Header />
 
       <div className="max-w-7xl mx-auto px-6 py-24">
         {/* Back to Cart */}
@@ -104,11 +200,19 @@ export default function CheckoutPage() {
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-3">First Name *</label>
-                      <Input className="border-gray-300 focus:border-yellow-500 focus:ring-yellow-500 h-12 text-lg" />
+                      <Input 
+                        value={shippingData.firstName}
+                        onChange={(e) => setShippingData({...shippingData, firstName: e.target.value})}
+                        className="border-gray-300 focus:border-yellow-500 focus:ring-yellow-500 h-12 text-lg" 
+                      />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-3">Last Name *</label>
-                      <Input className="border-gray-300 focus:border-yellow-500 focus:ring-yellow-500 h-12 text-lg" />
+                      <Input 
+                        value={shippingData.lastName}
+                        onChange={(e) => setShippingData({...shippingData, lastName: e.target.value})}
+                        className="border-gray-300 focus:border-yellow-500 focus:ring-yellow-500 h-12 text-lg" 
+                      />
                     </div>
                   </div>
 
@@ -116,6 +220,8 @@ export default function CheckoutPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-3">Email Address *</label>
                     <Input
                       type="email"
+                      value={shippingData.email}
+                      onChange={(e) => setShippingData({...shippingData, email: e.target.value})}
                       className="border-gray-300 focus:border-yellow-500 focus:ring-yellow-500 h-12 text-lg"
                     />
                   </div>
@@ -124,23 +230,33 @@ export default function CheckoutPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-3">Phone Number *</label>
                     <Input
                       type="tel"
+                      value={shippingData.phone}
+                      onChange={(e) => setShippingData({...shippingData, phone: e.target.value})}
                       className="border-gray-300 focus:border-yellow-500 focus:ring-yellow-500 h-12 text-lg"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-3">Address *</label>
-                    <Input className="border-gray-300 focus:border-yellow-500 focus:ring-yellow-500 h-12 text-lg" />
+                    <Input 
+                      value={shippingData.address}
+                      onChange={(e) => setShippingData({...shippingData, address: e.target.value})}
+                      className="border-gray-300 focus:border-yellow-500 focus:ring-yellow-500 h-12 text-lg" 
+                    />
                   </div>
 
                   <div className="grid md:grid-cols-3 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-3">City *</label>
-                      <Input className="border-gray-300 focus:border-yellow-500 focus:ring-yellow-500 h-12 text-lg" />
+                      <Input 
+                        value={shippingData.city}
+                        onChange={(e) => setShippingData({...shippingData, city: e.target.value})}
+                        className="border-gray-300 focus:border-yellow-500 focus:ring-yellow-500 h-12 text-lg" 
+                      />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-3">State/Province *</label>
-                      <Select>
+                      <Select value={shippingData.state} onValueChange={(value) => setShippingData({...shippingData, state: value})}>
                         <SelectTrigger className="border-gray-300 focus:border-yellow-500 focus:ring-yellow-500 h-12 text-lg">
                           <SelectValue placeholder="Select state" />
                         </SelectTrigger>
@@ -153,13 +269,17 @@ export default function CheckoutPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-3">ZIP Code *</label>
-                      <Input className="border-gray-300 focus:border-yellow-500 focus:ring-yellow-500 h-12 text-lg" />
+                      <Input 
+                        value={shippingData.zipCode}
+                        onChange={(e) => setShippingData({...shippingData, zipCode: e.target.value})}
+                        className="border-gray-300 focus:border-yellow-500 focus:ring-yellow-500 h-12 text-lg" 
+                      />
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-3">Country *</label>
-                    <Select>
+                    <Select value={shippingData.country} onValueChange={(value) => setShippingData({...shippingData, country: value})}>
                       <SelectTrigger className="border-gray-300 focus:border-yellow-500 focus:ring-yellow-500 h-12 text-lg">
                         <SelectValue placeholder="Select country" />
                       </SelectTrigger>
@@ -173,7 +293,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <Button
-                    onClick={() => setStep(2)}
+                    onClick={handleShippingSubmit}
                     size="lg"
                     className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black py-4 text-lg font-medium tracking-wide transition-all duration-500 hover:shadow-xl hover:shadow-yellow-500/25"
                   >
@@ -212,7 +332,7 @@ export default function CheckoutPage() {
                             ? "border-yellow-500 bg-yellow-50"
                             : "border-gray-200 hover:border-gray-300"
                         }`}
-                        onClick={() => setPaymentMethod("apple")}
+                        onClick={() => handlePaymentMethodSelect("apple")}
                       >
                         <div className="flex items-center space-x-4">
                           <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center">
@@ -232,7 +352,7 @@ export default function CheckoutPage() {
                             ? "border-yellow-500 bg-yellow-50"
                             : "border-gray-200 hover:border-gray-300"
                         }`}
-                        onClick={() => setPaymentMethod("card")}
+                        onClick={() => handlePaymentMethodSelect("card")}
                       >
                         <div className="flex items-center space-x-4">
                           <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -252,7 +372,7 @@ export default function CheckoutPage() {
                             ? "border-yellow-500 bg-yellow-50"
                             : "border-gray-200 hover:border-gray-300"
                         }`}
-                        onClick={() => setPaymentMethod("bank")}
+                        onClick={() => handlePaymentMethodSelect("bank")}
                       >
                         <div className="flex items-center space-x-4">
                           <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
@@ -282,35 +402,25 @@ export default function CheckoutPage() {
 
                   {paymentMethod === "card" && (
                     <div className="space-y-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">Card Number *</label>
-                        <Input
-                          placeholder="1234 5678 9012 3456"
-                          className="border-gray-300 focus:border-yellow-500 focus:ring-yellow-500 h-12 text-lg"
+                      {isProcessing ? (
+                        <div className="flex items-center justify-center p-8">
+                          <div className="text-center">
+                            <Loader2 className="h-8 w-8 animate-spin text-yellow-500 mx-auto mb-4" />
+                            <p className="text-gray-600">Setting up secure payment...</p>
+                          </div>
+                        </div>
+                      ) : clientSecret ? (
+                        <StripePaymentForm
+                          clientSecret={clientSecret}
+                          amount={total}
+                          onSuccess={handlePaymentSuccess}
+                          onError={handlePaymentError}
                         />
-                      </div>
-
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-3">Expiry Date *</label>
-                          <Input
-                            placeholder="MM/YY"
-                            className="border-gray-300 focus:border-yellow-500 focus:ring-yellow-500 h-12 text-lg"
-                          />
+                      ) : (
+                        <div className="text-center p-8">
+                          <p className="text-gray-600">Click on Credit Card to set up payment</p>
                         </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-3">CVV *</label>
-                          <Input
-                            placeholder="123"
-                            className="border-gray-300 focus:border-yellow-500 focus:ring-yellow-500 h-12 text-lg"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">Cardholder Name *</label>
-                        <Input className="border-gray-300 focus:border-yellow-500 focus:ring-yellow-500 h-12 text-lg" />
-                      </div>
+                      )}
                     </div>
                   )}
 
@@ -342,13 +452,6 @@ export default function CheckoutPage() {
                       className="flex-1 h-12 text-lg border-2 border-gray-300 hover:border-gray-400 bg-transparent"
                     >
                       Back to Shipping
-                    </Button>
-                    <Button
-                      onClick={() => setStep(3)}
-                      size="lg"
-                      className="flex-1 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black py-4 text-lg font-medium tracking-wide transition-all duration-500 hover:shadow-xl hover:shadow-yellow-500/25"
-                    >
-                      Complete Order
                     </Button>
                   </div>
                 </CardContent>
@@ -476,6 +579,7 @@ export default function CheckoutPage() {
       </div>
 
       <Footer />
-    </div>
+      </div>
+    </ClientOnly>
   )
 }

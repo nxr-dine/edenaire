@@ -21,6 +21,7 @@ import {
   MoreHorizontal,
 } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ClientOnly } from "@/components/client-only"
 import Image from "next/image"
 
 export default function AdminProducts() {
@@ -42,8 +43,6 @@ export default function AdminProducts() {
       revenue: 1080000,
       status: "Active",
       image: "/placeholder.svg?height=80&width=80",
-      rating: 5,
-      reviews: 24,
       featured: true,
     },
     {
@@ -59,8 +58,6 @@ export default function AdminProducts() {
       revenue: 644400,
       status: "Active",
       image: "/placeholder.svg?height=80&width=80",
-      rating: 5,
-      reviews: 18,
       featured: true,
     },
     {
@@ -76,8 +73,6 @@ export default function AdminProducts() {
       revenue: 582400,
       status: "Active",
       image: "/placeholder.svg?height=80&width=80",
-      rating: 5,
-      reviews: 32,
       featured: false,
     },
     {
@@ -93,8 +88,6 @@ export default function AdminProducts() {
       revenue: 336000,
       status: "Active",
       image: "/placeholder.svg?height=80&width=80",
-      rating: 5,
-      reviews: 15,
       featured: false,
     },
     {
@@ -110,8 +103,6 @@ export default function AdminProducts() {
       revenue: 228000,
       status: "Low Stock",
       image: "/placeholder.svg?height=80&width=80",
-      rating: 5,
-      reviews: 8,
       featured: true,
     },
     {
@@ -127,8 +118,6 @@ export default function AdminProducts() {
       revenue: 655200,
       status: "Out of Stock",
       image: "/placeholder.svg?height=80&width=80",
-      rating: 5,
-      reviews: 42,
       featured: false,
     },
   ]
@@ -209,7 +198,8 @@ export default function AdminProducts() {
   })
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <ClientOnly>
+      <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-4">
@@ -333,12 +323,6 @@ export default function AdminProducts() {
                             <div>
                               <p className="font-medium text-gray-900">{product.name}</p>
                               <div className="flex items-center space-x-2 mt-1">
-                                <div className="flex items-center">
-                                  {[...Array(product.rating)].map((_, i) => (
-                                    <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                                  ))}
-                                </div>
-                                <span className="text-xs text-gray-500">({product.reviews})</span>
                                 {product.featured && (
                                   <Badge className="bg-blue-100 text-blue-800 text-xs">Featured</Badge>
                                 )}
@@ -407,6 +391,6 @@ export default function AdminProducts() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </ClientOnly>
   )
 }

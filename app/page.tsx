@@ -92,9 +92,9 @@ export default function HomePage() {
   const { data: products, isLoading } = useSWR("/api/products", fetcher)
 
   // Filter for featured products (e.g., those with a badge or featured property)
-  const featuredProducts = (products || []).filter(
-    (product: any) => product.badge || product.featured
-  ).slice(0, 4)
+  const featuredProducts = products && Array.isArray(products) ? products.filter(
+    (product: any) => product && (product.badge || product.featured)
+  ).slice(0, 4) : []
 
   const getTierColor = (tier: string) => {
     switch (tier) {
@@ -118,7 +118,7 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         {/* Background Images */}
-        {heroImages.map((image, index) => (
+        {heroImages && Array.isArray(heroImages) && heroImages.map((image, index) => (
           <div
             key={index}
             className={`absolute inset-0 transition-opacity duration-1000 ${
@@ -192,7 +192,7 @@ export default function HomePage() {
             <div className="text-center py-12 text-gray-500">Loading featured products...</div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-              {featuredProducts.map((product: any) => (
+              {featuredProducts && Array.isArray(featuredProducts) && featuredProducts.map((product: any) => (
                 <Card
                   key={product.id}
                   className={`group cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 border-2 ${getTierColor(
@@ -284,7 +284,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
-            {tiers.map((tier, index) => (
+            {tiers && Array.isArray(tiers) && tiers.map((tier, index) => (
               <Card
                 key={tier.name}
                 className={`relative overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-2xl ${
@@ -316,7 +316,7 @@ export default function HomePage() {
                   </div>
 
                   <ul className="space-y-3 mb-8">
-                    {tier.features.map((feature, featureIndex) => (
+                    {tier.features && Array.isArray(tier.features) && tier.features.map((feature, featureIndex) => (
                       <li key={featureIndex} className="flex items-start">
                         <Star className="h-5 w-5 text-yellow-400 mr-3 mt-0.5 flex-shrink-0" />
                         <span className="text-gray-300 text-sm">{feature}</span>

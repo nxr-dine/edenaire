@@ -24,10 +24,10 @@ export default function WishlistPage() {
   const { data: wishlist, isLoading } = useSWR("/api/wishlist", fetcher)
   const wishlistItems = wishlist?.products || []
 
-  const filteredItems = wishlistItems.filter((item: any) => {
+  const filteredItems = wishlistItems && Array.isArray(wishlistItems) ? wishlistItems.filter((item: any) => {
     if (filterTier === "all") return true
-    return item.tier === filterTier
-  })
+    return item && item.tier === filterTier
+  }) : []
 
   const getTierColorClasses = (color: string) => {
     switch (color) {
@@ -60,7 +60,7 @@ export default function WishlistPage() {
               </p>
               <div className="mt-8">
                 <Badge className="bg-yellow-500 text-black px-4 py-2 text-sm font-medium">
-                  {filteredItems.length} Items Saved
+                  {filteredItems && Array.isArray(filteredItems) ? filteredItems.length : 0} Items Saved
                 </Badge>
               </div>
             </div>
@@ -135,7 +135,7 @@ export default function WishlistPage() {
             <div className="max-w-7xl mx-auto">
               {isLoading ? (
                 <div className="text-center py-16 sm:py-20 text-gray-500">Loading wishlist...</div>
-              ) : filteredItems.length === 0 ? (
+              ) : filteredItems && Array.isArray(filteredItems) && filteredItems.length === 0 ? (
                 /* Empty State */
                 <div className="text-center py-16 sm:py-20">
                   <Heart className="h-16 w-16 sm:h-20 sm:w-20 text-gray-300 mx-auto mb-6" />
@@ -157,7 +157,7 @@ export default function WishlistPage() {
                       : "space-y-4 sm:space-y-6"
                   }
                 >
-                  {filteredItems.map((item: any) => (
+                  {filteredItems && Array.isArray(filteredItems) && filteredItems.map((item: any) => (
                     <Card
                       key={item.id}
                       className={`group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 ${
@@ -268,7 +268,7 @@ export default function WishlistPage() {
           </section>
 
           {/* Recommendations */}
-          {filteredItems.length > 0 && (
+          {filteredItems && Array.isArray(filteredItems) && filteredItems.length > 0 && (
             <section className="py-12 sm:py-16 px-4 sm:px-6 bg-gray-100">
               <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-8 sm:mb-12">

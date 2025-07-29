@@ -12,290 +12,14 @@ import {
   DollarSign,
   Package,
   ShoppingCart,
-  Star,
   Eye,
   Edit,
-  Trash2,
   Plus,
-  Search,
   Filter,
-  MoreHorizontal,
   ArrowUpRight,
   ArrowDownRight,
   Calendar,
-  Clock,
-  MapPin,
-  Phone,
-  Mail,
-  Crown,
-  Diamond,
-  Gem,
-  Watch,
-  Heart,
-  Share2,
   Download,
-  Upload,
-  Settings,
-  Bell,
-  User,
-  LogOut,
-  ChevronDown,
-  ChevronUp,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  Info,
-  BarChart3,
-  PieChart,
-  Activity,
-  Target,
-  Award,
-  Zap,
-  Shield,
-  Lock,
-  Unlock,
-  RefreshCw,
-  RotateCcw,
-  Save,
-  Copy,
-  Link,
-  ExternalLink,
-  Home,
-  Grid,
-  List,
-  Columns,
-  Maximize,
-  Minimize,
-  Move,
-  GripVertical,
-  Hash,
-  Percent,
-  Minus,
-  Equal,
-  Divide,
-  Plus as PlusIcon,
-  X,
-  Check,
-  AlertTriangle,
-  HelpCircle,
-  FileText,
-  Image,
-  Video,
-  Music,
-  Archive,
-  Folder,
-  File,
-  FolderOpen,
-  FolderPlus,
-  FilePlus,
-  FileEdit,
-  FileX,
-  FileCheck,
-  FileSearch,
-  FileDown,
-  FileUp,
-  FileMinus,
-  FilePlus2,
-  FileText2,
-  FileImage,
-  FileVideo,
-  FileAudio,
-  FileArchive,
-  FileCode,
-  FileSpreadsheet,
-  FilePresentation,
-  FilePdf,
-  FileWord,
-  FileExcel,
-  FilePowerpoint,
-  FileZip,
-  FileCsv,
-  FileJson,
-  FileXml,
-  FileYaml,
-  FileMarkdown,
-  FileHtml,
-  FileCss,
-  FileJs,
-  FileTs,
-  FileJsx,
-  FileTsx,
-  FileVue,
-  FileReact,
-  FileAngular,
-  FileSvelte,
-  FileNext,
-  FileNuxt,
-  FileVite,
-  FileWebpack,
-  FileRollup,
-  FileParcel,
-  FileBabel,
-  FileEslint,
-  FilePrettier,
-  FileJest,
-  FileCypress,
-  FilePlaywright,
-  FileStorybook,
-  FileTailwind,
-  FileBootstrap,
-  FileMaterial,
-  FileAntd,
-  FileChakra,
-  FileMui,
-  FileShadcn,
-  FileRadix,
-  FileFramer,
-  FileThree,
-  FileD3,
-  FileChart,
-  FileTable,
-  FileDatabase,
-  FileServer,
-  FileApi,
-  FileGraphql,
-  FileRest,
-  FileSwagger,
-  FileOpenapi,
-  FileGrpc,
-  FileWebsocket,
-  FileSocket,
-  FileRedis,
-  FileMongo,
-  FilePostgres,
-  FileMysql,
-  FileSqlite,
-  FileOracle,
-  FileSql,
-  FileNosql,
-  FileFirebase,
-  FileSupabase,
-  FileAuth0,
-  FileStripe,
-  FilePaypal,
-  FileSquare,
-  FileCoinbase,
-  FileBitcoin,
-  FileEthereum,
-  FileCrypto,
-  FileNft,
-  FileBlockchain,
-  FileWeb3,
-  FileMetamask,
-  FileWallet,
-  FileExchange,
-  FileTrading,
-  FileChart2,
-  FileCandlestick,
-  FileTrending,
-  FileAnalytics,
-  FileMetrics,
-  FileKpi,
-  FileDashboard,
-  FileReport,
-  FileInsights,
-  FileData,
-  FileBigdata,
-  FileAi,
-  FileMl,
-  FileNeural,
-  FileRobot,
-  FileAutomation,
-  FileBot,
-  FileChat,
-  FileGpt,
-  FileOpenai,
-  FileClaude,
-  FileBard,
-  FileCopilot,
-  FileAssistant,
-  FileVoice,
-  FileSpeech,
-  FileAudio2,
-  FileVideo2,
-  FileStream,
-  FileBroadcast,
-  FilePodcast,
-  FileRadio,
-  FileTv,
-  FileMovie,
-  FilePhoto,
-  FileCamera,
-  FileScan,
-  FileQr,
-  FileBarcode,
-  FileFingerprint,
-  FileFace,
-  FileEye,
-  FileEar,
-  FileNose,
-  FileMouth,
-  FileTongue,
-  FileBrain,
-  FileHeart,
-  FileLungs,
-  FileLiver,
-  FileKidney,
-  FileStomach,
-  FileIntestine,
-  FileBone,
-  FileMuscle,
-  FileSkin,
-  FileHair,
-  FileNail,
-  FileTooth,
-  FileDna,
-  FileGene,
-  FileCell,
-  FileVirus,
-  FileBacteria,
-  FileParasite,
-  FileDisease,
-  FileMedicine,
-  FilePill,
-  FileSyringe,
-  FileBandage,
-  FileThermometer,
-  FileStethoscope,
-  FileXray,
-  FileMri,
-  FileCt,
-  FileUltrasound,
-  FileEcg,
-  FileEeg,
-  FileEmg,
-  FileEog,
-  FileEpg,
-  FileErg,
-  FileVep,
-  FileBera,
-  FileOae,
-  FileTympanometry,
-  FileAudiometry,
-  FileSpirometry,
-  FilePeak,
-  FileFev,
-  FileFvc,
-  FileTlc,
-  FileRv,
-  FileFrc,
-  FileIc,
-  FileErv,
-  FileTv2,
-  FileVt,
-  FileVd,
-  FileVa,
-  FileQ,
-  FileV,
-  FileP,
-  FileT,
-  FileR,
-  FileS,
-  FileU,
-  FileW,
-  FileX,
-  FileY,
-  FileZ,
 } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ClientOnly } from "@/components/client-only"
@@ -324,16 +48,25 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarEleme
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
 export default function AdminDashboard() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
+  try {
+    const { data: session, status } = useSession()
+    const router = useRouter()
+
+  // Data fetching hooks - moved to top to avoid initialization errors
+  const { data: users, mutate: mutateUsers } = useSWR(session && session.user?.role === "admin" ? "/api/admin/users" : null, fetcher)
+  const { data: products, mutate: mutateProducts } = useSWR(session && session.user?.role === "admin" ? "/api/admin/products" : null, fetcher)
+  const { data: orders, mutate: mutateOrders } = useSWR(session && session.user?.role === "admin" ? "/api/admin/orders" : null, fetcher)
+  const { data: categories, mutate: mutateCategories } = useSWR(session && session.user?.role === "admin" ? "/api/admin/categories" : null, fetcher)
 
   useEffect(() => {
-    if (status === "unauthenticated" || (session && session.user?.role !== "admin")) {
-      router.replace("/auth/login")
+    if (status === "unauthenticated") {
+      router.replace("/auth/login?callbackUrl=/admin/dashboard")
+    } else if (status === "authenticated" && session?.user?.role !== "admin") {
+      router.replace("/auth/login?callbackUrl=/admin/dashboard")
     }
   }, [status, session, router])
 
-  if (status === "loading" || (session && session.user?.role !== "admin")) {
+  if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500" />
@@ -341,205 +74,300 @@ export default function AdminDashboard() {
     )
   }
 
+  if (status === "authenticated" && session?.user?.role !== "admin") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto mb-4" />
+          <p className="text-gray-600">Checking admin permissions...</p>
+        </div>
+      </div>
+    )
+  }
+
   const [timeRange, setTimeRange] = useState("30d")
+
+  // Calculate real stats from data
+  const totalRevenue = orders && Array.isArray(orders) ? orders.reduce((sum, order) => sum + (order.total || 0), 0) : 0
+  const totalUsers = users && Array.isArray(users) ? users.length : 0
+  const totalOrders = orders && Array.isArray(orders) ? orders.length : 0
+  const totalProducts = products && Array.isArray(products) ? products.length : 0
+  
+  // Calculate conversion rate (orders per user)
+  const conversionRate = totalUsers > 0 ? ((totalOrders / totalUsers) * 100).toFixed(2) : 0
 
   const stats = [
     {
       title: "Total Revenue",
-      value: "$2,847,392",
-      change: "+12.5%",
+      value: `$${(totalRevenue || 0).toLocaleString()}`,
+      change: "+0%",
       trend: "up",
       icon: DollarSign,
       color: "text-green-600",
     },
     {
-      title: "Active Subscribers",
-      value: "1,247",
-      change: "+8.2%",
+      title: "Total Users",
+      value: totalUsers.toString(),
+      change: "+0%",
       trend: "up",
       icon: Users,
       color: "text-blue-600",
     },
     {
-      title: "Orders This Month",
-      value: "342",
-      change: "-2.1%",
-      trend: "down",
+      title: "Total Orders",
+      value: totalOrders.toString(),
+      change: "+0%",
+      trend: "up",
       icon: ShoppingCart,
       color: "text-orange-600",
     },
     {
       title: "Conversion Rate",
-      value: "3.24%",
-      change: "+0.8%",
+      value: `${conversionRate}%`,
+      change: "+0%",
       trend: "up",
       icon: TrendingUp,
       color: "text-purple-600",
     },
   ]
 
-  const subscriptionStats = [
-    {
-      tier: "Tier 1 (Free)",
-      count: 892,
-      percentage: 71.5,
-      revenue: "$0",
-      icon: Star,
-      color: "bg-gray-100 text-gray-800",
-    },
-    {
-      tier: "Tier 2 (Prestige)",
-      count: 284,
-      percentage: 22.8,
-      revenue: "$849,160",
-      icon: Diamond,
-      color: "bg-yellow-100 text-yellow-800",
-    },
-    {
-      tier: "Tier 3 (Ultra-Exclusive)",
-      count: 71,
-      percentage: 5.7,
-      revenue: "$709,290",
-      icon: Crown,
-      color: "bg-purple-100 text-purple-800",
-    },
-  ]
+  // Calculate real subscription stats from users
+  const userTiers = (() => {
+    try {
+      if (!users || !Array.isArray(users)) {
+        return {}
+      }
+      
+      return users.reduce((acc, user) => {
+        try {
+          const tier = user && user.tier && typeof user.tier === 'string' ? user.tier : 'iconic'
+          // Additional safety check to ensure tier is a valid string
+          if (!tier || typeof tier !== 'string' || tier.trim() === '') {
+            acc['iconic'] = (acc['iconic'] || 0) + 1
+          } else {
+            acc[tier] = (acc[tier] || 0) + 1
+          }
+          return acc
+        } catch (error) {
+          console.error('Error processing user tier:', error)
+          acc['iconic'] = (acc['iconic'] || 0) + 1
+          return acc
+        }
+      }, {})
+    } catch (error) {
+      console.error('Error calculating user tiers:', error)
+      return {}
+    }
+  })()
+  
+  const totalUserCount = users && Array.isArray(users) ? users.length : 0
+  
+  const subscriptionStats = (() => {
+    try {
+      if (!userTiers || typeof userTiers !== 'object' || Object.keys(userTiers).length === 0) {
+        return []
+      }
+      
+      return Object.entries(userTiers).map(([tier, count]) => {
+        try {
+          // Additional safety check for tier parameter
+          if (tier === undefined || tier === null) {
+            console.warn('Tier is undefined or null, using default')
+            tier = 'unknown'
+          }
+          
+          const percentage = totalUserCount > 0 ? ((count || 0) / totalUserCount * 100).toFixed(1) : 0
+          const revenue = tier === 'iconic' ? 0 : (count || 0) * 1000 // Mock revenue calculation
+          
+          // Safety check for tier
+          const safeTier = tier && typeof tier === 'string' ? tier : 'unknown'
+          const tierDisplayName = (() => {
+            try {
+              if (!safeTier || typeof safeTier !== 'string' || safeTier.length === 0) {
+                return 'Unknown'
+              }
+              return safeTier.charAt(0).toUpperCase() + safeTier.slice(1)
+            } catch (error) {
+              console.error('Error processing tier display name:', error)
+              return 'Unknown'
+            }
+          })()
+          
+          return {
+            tier: `Tier ${tierDisplayName}`,
+            users: count || 0,
+            percentage: `${percentage}%`,
+            revenue: `$${(revenue || 0).toLocaleString()}`,
+            trend: Math.random() > 0.5 ? "up" : "down",
+            icon: Users, // Add icon property
+          }
+        } catch (error) {
+          console.error('Error processing subscription stats item:', error)
+          return {
+            tier: 'Tier Unknown',
+            users: 0,
+            percentage: '0%',
+            revenue: '$0',
+            trend: 'up',
+            icon: Users,
+          }
+        }
+      })
+    } catch (error) {
+      console.error('Error processing subscription stats:', error)
+      return []
+    }
+  })()
 
-  const recentOrders = [
-    {
-      id: "ORD-2024-001",
-      customer: "Isabella Rothschild",
-      product: "Celestial Diamond Necklace",
-      amount: "$45,000",
-      status: "Completed",
-      tier: "Tier 3",
-      date: "2024-01-15",
-    },
-    {
-      id: "ORD-2024-002",
-      customer: "Marcus Wellington",
-      product: "Royal Sapphire Ring",
-      amount: "$35,800",
-      status: "Processing",
-      tier: "Tier 2",
-      date: "2024-01-14",
-    },
-    {
-      id: "ORD-2024-003",
-      customer: "Sophia Chen",
-      product: "Golden Aurora Earrings",
-      amount: "$18,200",
-      status: "Shipped",
-      tier: "Tier 2",
-      date: "2024-01-13",
-    },
-    {
-      id: "ORD-2024-004",
-      customer: "Alessandro Medici",
-      product: "Heritage Pearl Bracelet",
-      amount: "$22,400",
-      status: "Completed",
-      tier: "Tier 3",
-      date: "2024-01-12",
-    },
-  ]
+  // Calculate real recent orders from orders data
+  const recentOrders = orders && Array.isArray(orders) ? orders.slice(0, 5).map(order => ({
+    id: order.id,
+    customer: order.user?.name || order.user?.email || 'Unknown',
+    product: order.items?.[0]?.product?.name || 'Multiple items',
+    amount: `$${(order.total || 0).toLocaleString()}`,
+    status: order.status,
+    date: order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'Unknown',
+  })) : []
 
-  const topProducts = [
-    {
-      name: "Celestial Diamond Necklace",
-      sales: 24,
-      revenue: "$1,080,000",
-      tier: "Tier 3",
-      trend: "up",
-    },
-    {
-      name: "Royal Sapphire Ring",
-      sales: 18,
-      revenue: "$644,400",
-      tier: "Tier 2",
-      trend: "up",
-    },
-    {
-      name: "Golden Aurora Earrings",
-      sales: 32,
-      revenue: "$582,400",
-      tier: "Tier 2",
-      trend: "down",
-    },
-    {
-      name: "Heritage Pearl Bracelet",
-      sales: 15,
-      revenue: "$336,000",
-      tier: "Tier 1",
-      trend: "up",
-    },
-  ]
+  // Calculate real top products from products data
+  const topProducts = products && Array.isArray(products) ? products.slice(0, 4).map(product => ({
+    name: product.name,
+    sales: Math.floor(Math.random() * 50) + 1, // Mock sales data since we don't have order items
+    revenue: `$${((product.price || 0) * (Math.floor(Math.random() * 50) + 1)).toLocaleString()}`,
+    tier: product.category?.name || 'General',
+    trend: Math.random() > 0.5 ? "up" : "down",
+  })) : []
 
   // User Management Section
-  const { data: users, mutate } = useSWR(session && session.user?.role === "admin" ? "/api/admin/users" : null, fetcher)
-
   async function handleRoleChange(userId: string, role: string) {
-    await fetch("/api/admin/users", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, role }),
-    })
-    mutate()
+    try {
+      const response = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, role }),
+      })
+      if (response.ok) {
+        mutateUsers()
+        toast({ title: "Success", description: "User role updated successfully" })
+      } else {
+        toast({ title: "Error", description: "Failed to update user role", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to update user role", variant: "destructive" })
+    }
   }
 
   async function handleDeleteUser(userId: string) {
-    await fetch("/api/admin/users", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId }),
-    })
-    mutate()
+    try {
+      const response = await fetch("/api/admin/users", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      })
+      if (response.ok) {
+        mutateUsers()
+        toast({ title: "Success", description: "User deleted successfully" })
+      } else {
+        toast({ title: "Error", description: "Failed to delete user", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to delete user", variant: "destructive" })
+    }
   }
 
-  const { data: products, mutate: mutateProducts } = useSWR(session && session.user?.role === "admin" ? "/api/products" : null, fetcher)
-
   const [editingProduct, setEditingProduct] = useState<any>(null)
-  const [newProduct, setNewProduct] = useState({ name: "", description: "", price: "", image: "", categoryId: "" })
+  const [newProduct, setNewProduct] = useState({ name: "", description: "", price: "", quantity: "", discount: "", image: "", categoryId: "" })
 
   async function handleDeleteProduct(id: string) {
-    await fetch(`/api/products/${id}`, { method: "DELETE" })
-    mutateProducts()
+    try {
+      const response = await fetch("/api/admin/products", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      })
+      if (response.ok) {
+        mutateProducts()
+        toast({ title: "Success", description: "Product deleted successfully" })
+      } else {
+        toast({ title: "Error", description: "Failed to delete product", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to delete product", variant: "destructive" })
+    }
   }
 
   async function handleEditProduct(product: any) {
-    setEditingProduct(product)
+    setEditingProduct({
+      ...product,
+      name: product.name || "",
+      description: product.description || "",
+      price: product.price || "",
+      quantity: product.quantity || "",
+      discount: product.discount || "",
+      categoryId: product.categoryId || ""
+    })
   }
 
   async function handleUpdateProduct() {
-    await fetch(`/api/products/${editingProduct.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(editingProduct),
-    })
-    setEditingProduct(null)
-    mutateProducts()
+    try {
+      const response = await fetch("/api/admin/products", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingProduct),
+      })
+      if (response.ok) {
+        setEditingProduct(null)
+        mutateProducts()
+        toast({ title: "Success", description: "Product updated successfully" })
+      } else {
+        toast({ title: "Error", description: "Failed to update product", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to update product", variant: "destructive" })
+    }
   }
 
   async function handleCreateProduct(e: any) {
     e.preventDefault()
-    await fetch("/api/products", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...newProduct, price: parseFloat(newProduct.price) }),
-    })
-    setNewProduct({ name: "", description: "", price: "", image: "", categoryId: "" })
-    mutateProducts()
+    try {
+      const response = await fetch("/api/admin/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          ...newProduct, 
+          price: parseFloat(newProduct.price),
+          quantity: parseInt(newProduct.quantity),
+          discount: parseFloat(newProduct.discount)
+        }),
+      })
+      if (response.ok) {
+        setNewProduct({ name: "", description: "", price: "", quantity: "", discount: "", image: "", categoryId: "" })
+        mutateProducts()
+        toast({ title: "Success", description: "Product created successfully" })
+      } else {
+        toast({ title: "Error", description: "Failed to create product", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to create product", variant: "destructive" })
+    }
   }
 
-  const { data: orders, mutate: mutateOrders } = useSWR(session && session.user?.role === "admin" ? "/api/admin/orders" : null, fetcher)
-
   async function handleUpdateOrderStatus(orderId: string, status: string) {
-    await fetch("/api/admin/orders", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ orderId, status }),
-    })
-    mutateOrders()
+    try {
+      const response = await fetch("/api/admin/orders", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId, status }),
+      })
+      if (response.ok) {
+        mutateOrders()
+        toast({ title: "Success", description: "Order status updated successfully" })
+      } else {
+        toast({ title: "Error", description: "Failed to update order status", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to update order status", variant: "destructive" })
+    }
   }
 
   const [selectedOrder, setSelectedOrder] = useState<any>(null)
@@ -632,7 +460,6 @@ export default function AdminDashboard() {
     closeOrderStatusDialog()
   }
 
-  const { data: categories, mutate: mutateCategories } = useSWR(session && session.user?.role === "admin" ? "/api/categories" : null, fetcher)
   const [editingCategory, setEditingCategory] = useState<any>(null)
   const [newCategory, setNewCategory] = useState({ name: "" })
   const [deleteCategoryId, setDeleteCategoryId] = useState<string | null>(null)
@@ -649,38 +476,65 @@ export default function AdminDashboard() {
 
   async function handleCreateCategory(e: any) {
     e.preventDefault()
-    await fetch("/api/categories", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newCategory),
-    })
-    setNewCategory({ name: "" })
-    mutateCategories()
-    toast({ title: "Category created", description: "The category was created successfully." })
+    try {
+      const response = await fetch("/api/admin/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newCategory),
+      })
+      if (response.ok) {
+        setNewCategory({ name: "" })
+        mutateCategories()
+        toast({ title: "Success", description: "Category created successfully" })
+      } else {
+        toast({ title: "Error", description: "Failed to create category", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to create category", variant: "destructive" })
+    }
   }
 
   async function handleEditCategory(category: any) {
-    setEditingCategory(category)
+    setEditingCategory({
+      ...category,
+      name: category.name || ""
+    })
   }
 
   async function handleUpdateCategory() {
-    await fetch(`/api/categories/${editingCategory.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(editingCategory),
-    })
-    setEditingCategory(null)
-    mutateCategories()
-    toast({ title: "Category updated", description: "The category was updated successfully." })
+    try {
+      const response = await fetch("/api/admin/categories", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingCategory),
+      })
+      if (response.ok) {
+        setEditingCategory(null)
+        mutateCategories()
+        toast({ title: "Success", description: "Category updated successfully" })
+      } else {
+        toast({ title: "Error", description: "Failed to update category", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to update category", variant: "destructive" })
+    }
   }
 
   async function confirmDeleteCategory() {
     try {
-      await fetch(`/api/categories/${deleteCategoryId}`, { method: "DELETE" })
-      mutateCategories()
-      toast({ title: "Category deleted", description: "The category was deleted successfully." })
-    } catch {
-      toast({ title: "Error", description: "Failed to delete category.", variant: "destructive" })
+      const response = await fetch("/api/admin/categories", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: deleteCategoryId }),
+      })
+      if (response.ok) {
+        mutateCategories()
+        toast({ title: "Success", description: "Category deleted successfully" })
+      } else {
+        toast({ title: "Error", description: "Failed to delete category", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to delete category", variant: "destructive" })
     }
     closeDeleteCategoryDialog()
   }
@@ -694,15 +548,19 @@ export default function AdminDashboard() {
 
   const [userPage, setUserPage] = useState(1)
   const USERS_PER_PAGE = 10
+  const totalUserPages = users ? Math.ceil(users.length / USERS_PER_PAGE) : 1
 
   const [productPage, setProductPage] = useState(1)
   const PRODUCTS_PER_PAGE = 10
+  const totalProductPages = products ? Math.ceil(products.length / PRODUCTS_PER_PAGE) : 1
 
   const [orderPage, setOrderPage] = useState(1)
   const ORDERS_PER_PAGE = 10
+  const totalOrderPages = orders ? Math.ceil(orders.length / ORDERS_PER_PAGE) : 1
 
   const [categoryPage, setCategoryPage] = useState(1)
   const CATEGORIES_PER_PAGE = 10
+  const totalCategoryPages = categories ? Math.ceil(categories.length / CATEGORIES_PER_PAGE) : 1
 
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([])
   const allUsersSelected = users && users.length > 0 && users.every((user: any) => selectedUserIds.includes(user.id))
@@ -712,9 +570,9 @@ export default function AdminDashboard() {
   }
   function toggleSelectAllUsers() {
     if (allUsersSelected) {
-      setSelectedUserIds(ids => ids.filter(id => !users.some((user: any) => user.id === id)))
+      setSelectedUserIds(ids => ids.filter(id => !(users && Array.isArray(users) ? users.some((user: any) => user.id === id) : false)))
     } else {
-      setSelectedUserIds(ids => [...ids, ...users.filter((user: any) => !ids.includes(user.id)).map((user: any) => user.id)])
+      setSelectedUserIds(ids => [...ids, ...(users && Array.isArray(users) ? users.filter((user: any) => !ids.includes(user.id)).map((user: any) => user.id) : [])])
     }
   }
 
@@ -722,31 +580,38 @@ export default function AdminDashboard() {
 
   async function confirmBulkDeleteUsers() {
     try {
-      await Promise.all(selectedUserIds.map(userId => fetch("/api/admin/users", {
-        method: "DELETE",
+      const response = await fetch("/api/admin/bulk", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId }),
-      })))
-      mutate()
-      toast({ title: "Users deleted", description: "Selected users were deleted successfully." })
-      setSelectedUserIds([])
-    } catch {
-      toast({ title: "Error", description: "Failed to delete users.", variant: "destructive" })
+        body: JSON.stringify({
+          action: "deleteUsers",
+          ids: selectedUserIds
+        }),
+      })
+      if (response.ok) {
+        mutateUsers()
+        toast({ title: "Success", description: "Selected users deleted successfully" })
+        setSelectedUserIds([])
+      } else {
+        toast({ title: "Error", description: "Failed to delete users", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to delete users", variant: "destructive" })
     }
     setBulkDeleteDialogOpen(false)
   }
 
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([])
-  const allProductsSelected = products && products.length > 0 && products.every((product: any) => selectedProductIds.includes(product.id))
+  const allProductsSelected = products && Array.isArray(products) && products.length > 0 && products.every((product: any) => selectedProductIds.includes(product.id))
 
   function toggleProductSelection(productId: string) {
     setSelectedProductIds(ids => ids.includes(productId) ? ids.filter(id => id !== productId) : [...ids, productId])
   }
   function toggleSelectAllProducts() {
     if (allProductsSelected) {
-      setSelectedProductIds(ids => ids.filter(id => !products.some((product: any) => product.id === id)))
+      setSelectedProductIds(ids => ids.filter(id => !(products && Array.isArray(products) ? products.some((product: any) => product.id === id) : false)))
     } else {
-      setSelectedProductIds(ids => [...ids, ...products.filter((product: any) => !ids.includes(product.id)).map((product: any) => product.id)])
+      setSelectedProductIds(ids => [...ids, ...(products && Array.isArray(products) ? products.filter((product: any) => !ids.includes(product.id)).map((product: any) => product.id) : [])])
     }
   }
 
@@ -754,27 +619,38 @@ export default function AdminDashboard() {
 
   async function confirmBulkDeleteProducts() {
     try {
-      await Promise.all(selectedProductIds.map(productId => fetch(`/api/products/${productId}`, { method: "DELETE" })))
-      mutateProducts()
-      toast({ title: "Products deleted", description: "Selected products were deleted successfully." })
-      setSelectedProductIds([])
-    } catch {
-      toast({ title: "Error", description: "Failed to delete products.", variant: "destructive" })
+      const response = await fetch("/api/admin/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "deleteProducts",
+          ids: selectedProductIds
+        }),
+      })
+      if (response.ok) {
+        mutateProducts()
+        toast({ title: "Success", description: "Selected products deleted successfully" })
+        setSelectedProductIds([])
+      } else {
+        toast({ title: "Error", description: "Failed to delete products", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to delete products", variant: "destructive" })
     }
     setBulkDeleteProductsDialogOpen(false)
   }
 
   const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([])
-  const allOrdersSelected = orders && orders.length > 0 && orders.every((order: any) => selectedOrderIds.includes(order.id))
+  const allOrdersSelected = orders && Array.isArray(orders) && orders.length > 0 && orders.every((order: any) => selectedOrderIds.includes(order.id))
 
   function toggleOrderSelection(orderId: string) {
     setSelectedOrderIds(ids => ids.includes(orderId) ? ids.filter(id => id !== orderId) : [...ids, orderId])
   }
   function toggleSelectAllOrders() {
     if (allOrdersSelected) {
-      setSelectedOrderIds(ids => ids.filter(id => !orders.some((order: any) => order.id === id)))
+      setSelectedOrderIds(ids => ids.filter(id => !(orders && Array.isArray(orders) ? orders.some((order: any) => order.id === id) : false)))
     } else {
-      setSelectedOrderIds(ids => [...ids, ...orders.filter((order: any) => !ids.includes(order.id)).map((order: any) => order.id)])
+      setSelectedOrderIds(ids => [...ids, ...(orders && Array.isArray(orders) ? orders.filter((order: any) => !ids.includes(order.id)).map((order: any) => order.id) : [])])
     }
   }
 
@@ -782,31 +658,38 @@ export default function AdminDashboard() {
 
   async function confirmBulkDeleteOrders() {
     try {
-      await Promise.all(selectedOrderIds.map(orderId => fetch(`/api/admin/orders`, {
-        method: "DELETE",
+      const response = await fetch("/api/admin/bulk", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId }),
-      })))
-      mutateOrders()
-      toast({ title: "Orders deleted", description: "Selected orders were deleted successfully." })
-      setSelectedOrderIds([])
-    } catch {
-      toast({ title: "Error", description: "Failed to delete orders.", variant: "destructive" })
+        body: JSON.stringify({
+          action: "deleteOrders",
+          ids: selectedOrderIds
+        }),
+      })
+      if (response.ok) {
+        mutateOrders()
+        toast({ title: "Success", description: "Selected orders deleted successfully" })
+        setSelectedOrderIds([])
+      } else {
+        toast({ title: "Error", description: "Failed to delete orders", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to delete orders", variant: "destructive" })
     }
     setBulkDeleteOrdersDialogOpen(false)
   }
 
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([])
-  const allCategoriesSelected = categories && categories.length > 0 && categories.every((category: any) => selectedCategoryIds.includes(category.id))
+  const allCategoriesSelected = categories && Array.isArray(categories) && categories.length > 0 && categories.every((category: any) => selectedCategoryIds.includes(category.id))
 
   function toggleCategorySelection(categoryId: string) {
     setSelectedCategoryIds(ids => ids.includes(categoryId) ? ids.filter(id => id !== categoryId) : [...ids, categoryId])
   }
   function toggleSelectAllCategories() {
     if (allCategoriesSelected) {
-      setSelectedCategoryIds(ids => ids.filter(id => !categories.some((category: any) => category.id === id)))
+      setSelectedCategoryIds(ids => ids.filter(id => !(categories && Array.isArray(categories) ? categories.some((category: any) => category.id === id) : false)))
     } else {
-      setSelectedCategoryIds(ids => [...ids, ...categories.filter((category: any) => !ids.includes(category.id)).map((category: any) => category.id)])
+      setSelectedCategoryIds(ids => [...ids, ...(categories && Array.isArray(categories) ? categories.filter((category: any) => !ids.includes(category.id)).map((category: any) => category.id) : [])])
     }
   }
 
@@ -814,12 +697,23 @@ export default function AdminDashboard() {
 
   async function confirmBulkDeleteCategories() {
     try {
-      await Promise.all(selectedCategoryIds.map(categoryId => fetch(`/api/categories/${categoryId}`, { method: "DELETE" })))
-      mutateCategories()
-      toast({ title: "Categories deleted", description: "Selected categories were deleted successfully." })
-      setSelectedCategoryIds([])
-    } catch {
-      toast({ title: "Error", description: "Failed to delete categories.", variant: "destructive" })
+      const response = await fetch("/api/admin/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "deleteCategories",
+          ids: selectedCategoryIds
+        }),
+      })
+      if (response.ok) {
+        mutateCategories()
+        toast({ title: "Success", description: "Selected categories deleted successfully" })
+        setSelectedCategoryIds([])
+      } else {
+        toast({ title: "Error", description: "Failed to delete categories", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to delete categories", variant: "destructive" })
     }
     setBulkDeleteCategoriesDialogOpen(false)
   }
@@ -829,17 +723,25 @@ export default function AdminDashboard() {
 
   async function confirmBulkRoleUpdate() {
     try {
-      await Promise.all(selectedUserIds.map(userId => fetch("/api/admin/users", {
-        method: "PATCH",
+      const response = await fetch("/api/admin/bulk", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, role: bulkRole }),
-      })))
-      mutate()
-      toast({ title: "Roles updated", description: `Selected users were updated to role: ${bulkRole}.` })
-      setSelectedUserIds([])
-      setBulkRole("")
-    } catch {
-      toast({ title: "Error", description: "Failed to update user roles.", variant: "destructive" })
+        body: JSON.stringify({
+          action: "updateUserRoles",
+          ids: selectedUserIds,
+          data: { role: bulkRole }
+        }),
+      })
+      if (response.ok) {
+        mutateUsers()
+        toast({ title: "Success", description: "User roles updated successfully" })
+        setSelectedUserIds([])
+        setBulkRole("")
+      } else {
+        toast({ title: "Error", description: "Failed to update user roles", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to update user roles", variant: "destructive" })
     }
     setBulkRoleDialogOpen(false)
   }
@@ -849,17 +751,25 @@ export default function AdminDashboard() {
 
   async function confirmBulkOrderStatusUpdate() {
     try {
-      await Promise.all(selectedOrderIds.map(orderId => fetch("/api/admin/orders", {
-        method: "PATCH",
+      const response = await fetch("/api/admin/bulk", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId, status: bulkOrderStatus }),
-      })))
-      mutateOrders()
-      toast({ title: "Order statuses updated", description: `Selected orders were updated to status: ${bulkOrderStatus}.` })
-      setSelectedOrderIds([])
-      setBulkOrderStatus("")
-    } catch {
-      toast({ title: "Error", description: "Failed to update order statuses.", variant: "destructive" })
+        body: JSON.stringify({
+          action: "updateOrderStatus",
+          ids: selectedOrderIds,
+          data: { status: bulkOrderStatus }
+        }),
+      })
+      if (response.ok) {
+        mutateOrders()
+        toast({ title: "Success", description: "Order statuses updated successfully" })
+        setSelectedOrderIds([])
+        setBulkOrderStatus("")
+      } else {
+        toast({ title: "Error", description: "Failed to update order statuses", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to update order statuses", variant: "destructive" })
     }
     setBulkOrderStatusDialogOpen(false)
   }
@@ -869,17 +779,25 @@ export default function AdminDashboard() {
 
   async function confirmBulkCategoryRename() {
     try {
-      await Promise.all(selectedCategoryIds.map(categoryId => fetch(`/api/categories/${categoryId}`, {
-        method: "PUT",
+      const response = await fetch("/api/admin/bulk", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: bulkCategoryName }),
-      })))
-      mutateCategories()
-      toast({ title: "Categories renamed", description: `Selected categories were renamed to: ${bulkCategoryName}.` })
-      setSelectedCategoryIds([])
-      setBulkCategoryName("")
-    } catch {
-      toast({ title: "Error", description: "Failed to rename categories.", variant: "destructive" })
+        body: JSON.stringify({
+          action: "renameCategories",
+          ids: selectedCategoryIds,
+          data: { name: bulkCategoryName }
+        }),
+      })
+      if (response.ok) {
+        mutateCategories()
+        toast({ title: "Success", description: "Categories renamed successfully" })
+        setSelectedCategoryIds([])
+        setBulkCategoryName("")
+      } else {
+        toast({ title: "Error", description: "Failed to rename categories", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to rename categories", variant: "destructive" })
     }
     setBulkCategoryRenameDialogOpen(false)
   }
@@ -927,11 +845,11 @@ export default function AdminDashboard() {
                 <CardContent>
                   <Line
                     data={{
-                      labels: analytics.salesPerMonth.map((m: any) => `${m.year}-${String(m.month).padStart(2, "0")}`),
+                      labels: analytics?.salesPerMonth && Array.isArray(analytics.salesPerMonth) ? analytics.salesPerMonth.map((m: any) => `${m.year}-${String(m.month).padStart(2, "0")}`) : [],
                       datasets: [
                         {
                           label: "Sales ($)",
-                          data: analytics.salesPerMonth.map((m: any) => m.total),
+                          data: analytics?.salesPerMonth && Array.isArray(analytics.salesPerMonth) ? analytics.salesPerMonth.map((m: any) => m.total) : [],
                           borderColor: "#f59e0b",
                           backgroundColor: "rgba(251,191,36,0.2)",
                           tension: 0.4,
@@ -939,7 +857,7 @@ export default function AdminDashboard() {
                         },
                         {
                           label: "Orders",
-                          data: analytics.salesPerMonth.map((m: any) => m.count),
+                          data: analytics?.salesPerMonth && Array.isArray(analytics.salesPerMonth) ? analytics.salesPerMonth.map((m: any) => m.count) : [],
                           borderColor: "#6366f1",
                           backgroundColor: "rgba(99,102,241,0.2)",
                           yAxisID: "y1",
@@ -976,16 +894,16 @@ export default function AdminDashboard() {
                 <CardContent>
                   <Bar
                     data={{
-                      labels: analytics.topProducts.map((p: any) => p.name),
+                      labels: analytics?.topProducts && Array.isArray(analytics.topProducts) ? analytics.topProducts.map((p: any) => p.name) : [],
                       datasets: [
                         {
                           label: "Units Sold",
-                          data: analytics.topProducts.map((p: any) => p.quantity),
+                          data: analytics?.topProducts && Array.isArray(analytics.topProducts) ? analytics.topProducts.map((p: any) => p.quantity) : [],
                           backgroundColor: "#f59e0b",
                         },
                         {
                           label: "Revenue ($)",
-                          data: analytics.topProducts.map((p: any) => p.revenue),
+                          data: analytics?.topProducts && Array.isArray(analytics.topProducts) ? analytics.topProducts.map((p: any) => p.revenue) : [],
                           backgroundColor: "#6366f1",
                         },
                       ],
@@ -1011,11 +929,11 @@ export default function AdminDashboard() {
                 <CardContent>
                   <Line
                     data={{
-                      labels: analytics.userRegistrations.map((m: any) => `${m.year}-${String(m.month).padStart(2, "0")}`),
+                      labels: analytics?.userRegistrations && Array.isArray(analytics.userRegistrations) ? analytics.userRegistrations.map((m: any) => `${m.year}-${String(m.month).padStart(2, "0")}`) : [],
                       datasets: [
                         {
                           label: "Registrations",
-                          data: analytics.userRegistrations.map((m: any) => m.count),
+                          data: analytics?.userRegistrations && Array.isArray(analytics.userRegistrations) ? analytics.userRegistrations.map((m: any) => m.count) : [],
                           borderColor: "#10b981",
                           backgroundColor: "rgba(16,185,129,0.2)",
                           tension: 0.4,
@@ -1044,11 +962,11 @@ export default function AdminDashboard() {
                 <CardContent>
                   <Bar
                     data={{
-                      labels: analytics.categorySales.map((c: any) => c.name),
+                      labels: analytics?.categorySales && Array.isArray(analytics.categorySales) ? analytics.categorySales.map((c: any) => c.name) : [],
                       datasets: [
                         {
                           label: "Revenue ($)",
-                          data: analytics.categorySales.map((c: any) => c.revenue),
+                          data: analytics?.categorySales && Array.isArray(analytics.categorySales) ? analytics.categorySales.map((c: any) => c.revenue) : [],
                           backgroundColor: "#0ea5e9",
                         },
                       ],
@@ -1115,11 +1033,11 @@ export default function AdminDashboard() {
                         </div>
                         <div>
                           <p className="font-medium text-gray-900">{tier.tier}</p>
-                          <p className="text-sm text-gray-600">{tier.count} subscribers</p>
+                          <p className="text-sm text-gray-600">{tier.users} subscribers</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <Badge className={tier.color}>{tier.percentage}%</Badge>
+                        <Badge className={tier.color}>{tier.percentage}</Badge>
                         <p className="text-sm text-gray-600 mt-1">{tier.revenue}</p>
                       </div>
                     </div>
@@ -1172,19 +1090,61 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <Button className="w-full justify-start bg-gradient-to-r from-yellow-400 to-yellow-600 text-black">
+                  <Button 
+                    className="w-full justify-start bg-gradient-to-r from-yellow-400 to-yellow-600 text-black"
+                    onClick={() => {
+                      // Scroll to product management section
+                      const productSection = document.querySelector('[data-section="products"]');
+                      if (productSection) {
+                        productSection.scrollIntoView({ behavior: 'smooth' });
+                      }
+                      toast({ title: "Quick Action", description: "Navigated to Product Management section" });
+                    }}
+                  >
                     <Plus className="h-4 w-4 mr-2" />
                     Add New Product
                   </Button>
-                  <Button variant="outline" className="w-full justify-start bg-transparent">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start bg-transparent"
+                    onClick={() => {
+                      // Scroll to user management section
+                      const userSection = document.querySelector('[data-section="users"]');
+                      if (userSection) {
+                        userSection.scrollIntoView({ behavior: 'smooth' });
+                      }
+                      toast({ title: "Quick Action", description: "Navigated to User Management section" });
+                    }}
+                  >
                     <Users className="h-4 w-4 mr-2" />
                     Manage Subscribers
                   </Button>
-                  <Button variant="outline" className="w-full justify-start bg-transparent">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start bg-transparent"
+                    onClick={() => {
+                      // Scroll to product management section (inventory)
+                      const productSection = document.querySelector('[data-section="products"]');
+                      if (productSection) {
+                        productSection.scrollIntoView({ behavior: 'smooth' });
+                      }
+                      toast({ title: "Quick Action", description: "Navigated to Inventory Management section" });
+                    }}
+                  >
                     <Package className="h-4 w-4 mr-2" />
                     Inventory Management
                   </Button>
-                  <Button variant="outline" className="w-full justify-start bg-transparent">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start bg-transparent"
+                    onClick={() => {
+                      // Show analytics/reports section
+                      toast({ 
+                        title: "Reports", 
+                        description: "Reports feature coming soon. Use the Analytics section for current data insights." 
+                      });
+                    }}
+                  >
                     <Calendar className="h-4 w-4 mr-2" />
                     Schedule Reports
                   </Button>
@@ -1218,7 +1178,6 @@ export default function AdminDashboard() {
                       <th className="text-left py-3 px-4 font-medium text-gray-600">Customer</th>
                       <th className="text-left py-3 px-4 font-medium text-gray-600">Product</th>
                       <th className="text-left py-3 px-4 font-medium text-gray-600">Amount</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-600">Tier</th>
                       <th className="text-left py-3 px-4 font-medium text-gray-600">Status</th>
                       <th className="text-left py-3 px-4 font-medium text-gray-600">Date</th>
                       <th className="text-left py-3 px-4 font-medium text-gray-600">Actions</th>
@@ -1231,19 +1190,6 @@ export default function AdminDashboard() {
                         <td className="py-4 px-4 text-gray-700">{order.customer}</td>
                         <td className="py-4 px-4 text-gray-700">{order.product}</td>
                         <td className="py-4 px-4 font-medium text-gray-900">{order.amount}</td>
-                        <td className="py-4 px-4">
-                          <Badge
-                            className={
-                              order.tier === "Tier 3"
-                                ? "bg-purple-100 text-purple-800"
-                                : order.tier === "Tier 2"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : "bg-gray-100 text-gray-800"
-                            }
-                          >
-                            {order.tier}
-                          </Badge>
-                        </td>
                         <td className="py-4 px-4">
                           <Badge
                             className={
@@ -1277,7 +1223,7 @@ export default function AdminDashboard() {
           </Card>
 
           {/* User Management Table */}
-          <Card className="border-0 shadow-lg mt-8">
+          <Card className="border-0 shadow-lg mt-8" data-section="users">
             <CardHeader>
               <CardTitle className="text-xl font-light">User Management</CardTitle>
             </CardHeader>
@@ -1286,14 +1232,14 @@ export default function AdminDashboard() {
                 <input
                   type="text"
                   placeholder="Search users by name or email..."
-                  value={userSearch}
+                  value={userSearch || ""}
                   onChange={e => setUserSearch(e.target.value)}
                   className="border rounded px-3 py-2 w-64"
                 />
               </div>
               {selectedUserIds.length > 0 && (
                 <div className="mb-4 flex items-center gap-2">
-                  <select value={bulkRole} onChange={e => setBulkRole(e.target.value)} className="border rounded px-2 py-1">
+                  <select value={bulkRole || ""} onChange={e => setBulkRole(e.target.value)} className="border rounded px-2 py-1">
                     <option value="">Change role to...</option>
                     <option value="user">User</option>
                     <option value="admin">Admin</option>
@@ -1356,18 +1302,29 @@ export default function AdminDashboard() {
           </Card>
 
           {/* Product Management Table */}
-          <Card className="border-0 shadow-lg mt-8">
+          <Card className="border-0 shadow-lg mt-8" data-section="products">
             <CardHeader>
               <CardTitle className="text-xl font-light">Product Management</CardTitle>
             </CardHeader>
             <CardContent>
+              <div className="flex justify-end mb-4">
+                <input
+                  type="text"
+                  placeholder="Search products by name or description..."
+                  value={productSearch || ""}
+                  onChange={e => setProductSearch(e.target.value)}
+                  className="border rounded px-3 py-2 w-64"
+                />
+              </div>
               {/* Create Product Form */}
               <form className="mb-6 flex flex-wrap gap-2 items-end" onSubmit={handleCreateProduct}>
-                <input type="text" placeholder="Name" value={newProduct.name} onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} className="border rounded px-2 py-1" required />
-                <input type="text" placeholder="Description" value={newProduct.description} onChange={e => setNewProduct({ ...newProduct, description: e.target.value })} className="border rounded px-2 py-1" />
-                <input type="number" placeholder="Price" value={newProduct.price} onChange={e => setNewProduct({ ...newProduct, price: e.target.value })} className="border rounded px-2 py-1" required />
-                <input type="text" placeholder="Image URL" value={newProduct.image} onChange={e => setNewProduct({ ...newProduct, image: e.target.value })} className="border rounded px-2 py-1" />
-                <input type="text" placeholder="Category ID" value={newProduct.categoryId} onChange={e => setNewProduct({ ...newProduct, categoryId: e.target.value })} className="border rounded px-2 py-1" />
+                <input type="text" placeholder="Name" value={newProduct.name || ""} onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} className="border rounded px-2 py-1" required />
+                <input type="text" placeholder="Description" value={newProduct.description || ""} onChange={e => setNewProduct({ ...newProduct, description: e.target.value })} className="border rounded px-2 py-1" />
+                <input type="number" placeholder="Price" value={newProduct.price || ""} onChange={e => setNewProduct({ ...newProduct, price: e.target.value })} className="border rounded px-2 py-1" required />
+                <input type="number" placeholder="Quantity" value={newProduct.quantity || ""} onChange={e => setNewProduct({ ...newProduct, quantity: e.target.value })} className="border rounded px-2 py-1" required />
+                <input type="number" placeholder="Discount %" value={newProduct.discount || ""} onChange={e => setNewProduct({ ...newProduct, discount: e.target.value })} className="border rounded px-2 py-1" min="0" max="100" step="0.1" />
+                <input type="text" placeholder="Image URL" value={newProduct.image || ""} onChange={e => setNewProduct({ ...newProduct, image: e.target.value })} className="border rounded px-2 py-1" />
+                <input type="text" placeholder="Category ID" value={newProduct.categoryId || ""} onChange={e => setNewProduct({ ...newProduct, categoryId: e.target.value })} className="border rounded px-2 py-1" />
                 <Button type="submit" size="sm">Add Product</Button>
               </form>
               {/* Product Table */}
@@ -1379,37 +1336,49 @@ export default function AdminDashboard() {
                       <th className="text-left py-3 px-4 font-medium text-gray-600">Name</th>
                       <th className="text-left py-3 px-4 font-medium text-gray-600">Description</th>
                       <th className="text-left py-3 px-4 font-medium text-gray-600">Price</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-600">Quantity</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-600">Discount %</th>
                       <th className="text-left py-3 px-4 font-medium text-gray-600">Category</th>
                       <th className="text-left py-3 px-4 font-medium text-gray-600">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {products && products.length > 0 ? products
+                    {products && Array.isArray(products) && products.length > 0 ? products
                       .filter((product: any) =>
-                        product.name?.toLowerCase().includes(productSearch.toLowerCase()) ||
-                        product.description?.toLowerCase().includes(productSearch.toLowerCase())
+                        product && product.name?.toLowerCase().includes(productSearch.toLowerCase()) ||
+                        product && product.description?.toLowerCase().includes(productSearch.toLowerCase())
                       )
-                      .map((product: any) => (
+                      .map((product: any) => product && (
                       <tr key={product.id} className="border-b border-gray-100 hover:bg-gray-50">
                         <td className="py-4 px-4"><input type="checkbox" checked={selectedProductIds.includes(product.id)} onChange={() => toggleProductSelection(product.id)} /></td>
                         <td className="py-4 px-4 font-medium text-gray-900">
                           {editingProduct && editingProduct.id === product.id ? (
-                            <input type="text" value={editingProduct.name} onChange={e => setEditingProduct({ ...editingProduct, name: e.target.value })} className="border rounded px-2 py-1" />
+                            <input type="text" value={editingProduct ? (editingProduct.name || "") : ""} onChange={e => setEditingProduct({ ...editingProduct, name: e.target.value })} className="border rounded px-2 py-1" />
                           ) : product.name}
                         </td>
                         <td className="py-4 px-4 text-gray-700">
                           {editingProduct && editingProduct.id === product.id ? (
-                            <input type="text" value={editingProduct.description} onChange={e => setEditingProduct({ ...editingProduct, description: e.target.value })} className="border rounded px-2 py-1" />
+                            <input type="text" value={editingProduct ? (editingProduct.description || "") : ""} onChange={e => setEditingProduct({ ...editingProduct, description: e.target.value })} className="border rounded px-2 py-1" />
                           ) : product.description}
                         </td>
                         <td className="py-4 px-4 text-gray-700">
                           {editingProduct && editingProduct.id === product.id ? (
-                            <input type="number" value={editingProduct.price} onChange={e => setEditingProduct({ ...editingProduct, price: parseFloat(e.target.value) })} className="border rounded px-2 py-1" />
+                            <input type="number" value={editingProduct ? (editingProduct.price || "") : ""} onChange={e => setEditingProduct({ ...editingProduct, price: parseFloat(e.target.value) })} className="border rounded px-2 py-1" />
                           ) : product.price}
                         </td>
                         <td className="py-4 px-4 text-gray-700">
                           {editingProduct && editingProduct.id === product.id ? (
-                            <input type="text" value={editingProduct.categoryId || ""} onChange={e => setEditingProduct({ ...editingProduct, categoryId: e.target.value })} className="border rounded px-2 py-1" />
+                            <input type="number" value={editingProduct ? (editingProduct.quantity || "") : ""} onChange={e => setEditingProduct({ ...editingProduct, quantity: parseInt(e.target.value) || 0 })} className="border rounded px-2 py-1" />
+                          ) : (product.quantity || 0)}
+                        </td>
+                        <td className="py-4 px-4 text-gray-700">
+                          {editingProduct && editingProduct.id === product.id ? (
+                            <input type="number" value={editingProduct ? (editingProduct.discount || "") : ""} onChange={e => setEditingProduct({ ...editingProduct, discount: parseFloat(e.target.value) || 0 })} className="border rounded px-2 py-1" min="0" max="100" step="0.1" />
+                          ) : (product.discount || 0)}
+                        </td>
+                        <td className="py-4 px-4 text-gray-700">
+                          {editingProduct && editingProduct.id === product.id ? (
+                            <input type="text" value={editingProduct ? (editingProduct.categoryId || "") : ""} onChange={e => setEditingProduct({ ...editingProduct, categoryId: e.target.value })} className="border rounded px-2 py-1" />
                           ) : (product.category?.name || product.categoryId || "")}
                         </td>
                         <td className="py-4 px-4">
@@ -1427,12 +1396,12 @@ export default function AdminDashboard() {
                         </td>
                       </tr>
                     )) : (
-                      <tr><td colSpan={6} className="py-4 px-4 text-center text-gray-500">No products found.</td></tr>
+                      <tr><td colSpan={8} className="py-4 px-4 text-center text-gray-500">No products found.</td></tr>
                     )}
                   </tbody>
                 </table>
               </div>
-              {selectedProductIds.length > 0 && (
+              {selectedProductIds && selectedProductIds.length > 0 && (
                 <div className="mb-4 flex items-center gap-2">
                   <Button variant="destructive" size="sm" onClick={() => setBulkDeleteProductsDialogOpen(true)}>
                     Delete Selected ({selectedProductIds.length})
@@ -1440,7 +1409,7 @@ export default function AdminDashboard() {
                 </div>
               )}
               {/* Pagination for Products */}
-              {products && products.length > 0 && (
+              {products && Array.isArray(products) && products.length > 0 && (
                 <div className="flex justify-center items-center gap-2 mt-4">
                   <Button size="sm" variant="outline" disabled={productPage === 1} onClick={() => setProductPage(productPage - 1)}>Previous</Button>
                   {Array.from({ length: totalProductPages }, (_, i) => (
@@ -1469,14 +1438,14 @@ export default function AdminDashboard() {
                 <input
                   type="text"
                   placeholder="Search orders by user, email, or order ID..."
-                  value={orderSearch}
+                  value={orderSearch || ""}
                   onChange={e => setOrderSearch(e.target.value)}
                   className="border rounded px-3 py-2 w-64"
                 />
               </div>
               {selectedOrderIds.length > 0 && (
                 <div className="mb-4 flex items-center gap-2">
-                  <select value={bulkOrderStatus} onChange={e => setBulkOrderStatus(e.target.value)} className="border rounded px-2 py-1">
+                  <select value={bulkOrderStatus || ""} onChange={e => setBulkOrderStatus(e.target.value)} className="border rounded px-2 py-1">
                     <option value="">Change status to...</option>
                     <option value="pending">Pending</option>
                     <option value="processing">Processing</option>
@@ -1572,9 +1541,18 @@ export default function AdminDashboard() {
               <CardTitle className="text-xl font-light">Category Management</CardTitle>
             </CardHeader>
             <CardContent>
+              <div className="flex justify-end mb-4">
+                <input
+                  type="text"
+                  placeholder="Search categories by name..."
+                  value={categorySearch || ""}
+                  onChange={e => setCategorySearch(e.target.value)}
+                  className="border rounded px-3 py-2 w-64"
+                />
+              </div>
               {/* Create Category Form */}
               <form className="mb-6 flex flex-wrap gap-2 items-end" onSubmit={handleCreateCategory}>
-                <input type="text" placeholder="Name" value={newCategory.name} onChange={e => setNewCategory({ name: e.target.value })} className="border rounded px-2 py-1" required />
+                <input type="text" placeholder="Name" value={newCategory.name || ""} onChange={e => setNewCategory({ name: e.target.value })} className="border rounded px-2 py-1" required />
                 <Button type="submit" size="sm">Add Category</Button>
               </form>
               {/* Category Table */}
@@ -1597,7 +1575,7 @@ export default function AdminDashboard() {
                         <td className="py-4 px-4"><input type="checkbox" checked={selectedCategoryIds.includes(category.id)} onChange={() => toggleCategorySelection(category.id)} /></td>
                         <td className="py-4 px-4 font-medium text-gray-900">
                           {editingCategory && editingCategory.id === category.id ? (
-                            <input type="text" value={editingCategory.name} onChange={e => setEditingCategory({ ...editingCategory, name: e.target.value })} className="border rounded px-2 py-1" />
+                            <input type="text" value={editingCategory ? (editingCategory.name || "") : ""} onChange={e => setEditingCategory({ ...editingCategory, name: e.target.value })} className="border rounded px-2 py-1" />
                           ) : category.name}
                         </td>
                         <td className="py-4 px-4">
@@ -1642,7 +1620,7 @@ export default function AdminDashboard() {
                   <input
                     type="text"
                     placeholder="Rename selected to..."
-                    value={bulkCategoryName}
+                    value={bulkCategoryName || ""}
                     onChange={e => setBulkCategoryName(e.target.value)}
                     className="border rounded px-2 py-1"
                   />
@@ -1657,44 +1635,8 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          {/* Order Details Modal */}
-          <Dialog open={orderModalOpen} onOpenChange={closeOrderModal}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Order Details</DialogTitle>
-                <DialogDescription>Order ID: {selectedOrder?.id}</DialogDescription>
-              </DialogHeader>
-              {selectedOrder && (
-                <div className="space-y-4">
-                  <div>
-                    <span className="font-medium">User:</span> {selectedOrder.user?.name || selectedOrder.user?.email}
-                  </div>
-                  <div>
-                    <span className="font-medium">Status:</span> {selectedOrder.status}
-                  </div>
-                  <div>
-                    <span className="font-medium">Created:</span> {new Date(selectedOrder.createdAt).toLocaleString()}
-                  </div>
-                  <div>
-                    <span className="font-medium">Total:</span> ${selectedOrder.total.toFixed(2)}
-                  </div>
-                  <div>
-                    <span className="font-medium">Products:</span>
-                    <ul className="ml-4 mt-2 list-disc">
-                      {selectedOrder.items.map((item: any) => (
-                        <li key={item.id}>
-                          {item.product?.name} (x{item.quantity}) - ${item.price.toFixed(2)}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              )}
-            </DialogContent>
-          </Dialog>
-
           {/* Delete User Confirmation Dialog */}
-          <Dialog open={deleteUserDialogOpen} onOpenChange={closeDeleteUserDialog}>
+          <Dialog open={deleteUserDialogOpen} onOpenChange={setDeleteUserDialogOpen}>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Delete User</DialogTitle>
@@ -1708,7 +1650,7 @@ export default function AdminDashboard() {
           </Dialog>
 
           {/* Delete Product Confirmation Dialog */}
-          <Dialog open={deleteProductDialogOpen} onOpenChange={closeDeleteProductDialog}>
+          <Dialog open={deleteProductDialogOpen} onOpenChange={setDeleteProductDialogOpen}>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Delete Product</DialogTitle>
@@ -1721,22 +1663,8 @@ export default function AdminDashboard() {
             </DialogContent>
           </Dialog>
 
-          {/* Order Status Change Confirmation Dialog */}
-          <Dialog open={orderStatusDialogOpen} onOpenChange={closeOrderStatusDialog}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Change Order Status</DialogTitle>
-                <DialogDescription>Are you sure you want to change the order status to <span className="font-semibold">{orderStatusChange?.newStatus}</span>?</DialogDescription>
-              </DialogHeader>
-              <div className="flex justify-end gap-2 mt-4">
-                <Button variant="outline" onClick={closeOrderStatusDialog}>Cancel</Button>
-                <Button variant="default" onClick={confirmOrderStatusChange}>Confirm</Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-
           {/* Delete Category Confirmation Dialog */}
-          <Dialog open={deleteCategoryDialogOpen} onOpenChange={closeDeleteCategoryDialog}>
+          <Dialog open={deleteCategoryDialogOpen} onOpenChange={setDeleteCategoryDialogOpen}>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Delete Category</DialogTitle>
@@ -1749,7 +1677,62 @@ export default function AdminDashboard() {
             </DialogContent>
           </Dialog>
 
-          {/* Bulk Delete User Confirmation Dialog */}
+          {/* Order Status Change Confirmation Dialog */}
+          <Dialog open={orderStatusDialogOpen} onOpenChange={setOrderStatusDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Change Order Status</DialogTitle>
+                <DialogDescription>Are you sure you want to change the order status to <span className="font-semibold">{orderStatusChange?.newStatus}</span>?</DialogDescription>
+              </DialogHeader>
+              <div className="flex justify-end gap-2 mt-4">
+                <Button variant="outline" onClick={closeOrderStatusDialog}>Cancel</Button>
+                <Button variant="default" onClick={confirmOrderStatusChange}>Change Status</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Order Details Modal */}
+          <Dialog open={orderModalOpen} onOpenChange={setOrderModalOpen}>
+            <DialogContent className="max-w-4xl">
+              <DialogHeader>
+                <DialogTitle>Order Details</DialogTitle>
+              </DialogHeader>
+              {selectedOrder && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-medium">Order Information</h4>
+                      <p><strong>Order ID:</strong> {selectedOrder.id}</p>
+                      <p><strong>Status:</strong> {selectedOrder.status}</p>
+                      <p><strong>Total:</strong> ${(selectedOrder.total || 0).toLocaleString()}</p>
+                      <p><strong>Created:</strong> {selectedOrder.createdAt ? new Date(selectedOrder.createdAt).toLocaleString() : 'Unknown'}</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Customer Information</h4>
+                      <p><strong>Name:</strong> {selectedOrder.user?.name || 'N/A'}</p>
+                      <p><strong>Email:</strong> {selectedOrder.user?.email || 'N/A'}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-2">Order Items</h4>
+                    <div className="space-y-2">
+                      {selectedOrder.items && Array.isArray(selectedOrder.items) && selectedOrder.items.map((item: any, index: number) => (
+                        <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                          <div>
+                            <p className="font-medium">{item.product?.name || 'Unknown Product'}</p>
+                            <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                          </div>
+                          <p className="font-medium">${(item.price || 0).toLocaleString()}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+
+          {/* Bulk Delete Users Confirmation Dialog */}
           <Dialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
             <DialogContent>
               <DialogHeader>
@@ -1850,4 +1833,16 @@ export default function AdminDashboard() {
       </div>
     </ClientOnly>
   )
+  } catch (error) {
+    console.error('AdminDashboard Error:', error)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4" />
+          <p className="text-red-600 mb-2">Something went wrong</p>
+          <p className="text-gray-600 text-sm">Please refresh the page or contact support</p>
+        </div>
+      </div>
+    )
+  }
 }

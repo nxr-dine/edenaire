@@ -22,9 +22,9 @@ export default function ShopPage() {
 
   const { data: products, isLoading } = useSWR("/api/products", fetcher)
 
-  const filteredProducts = (products || []).filter(
-    (product: any) => product.price >= priceRange[0] && product.price <= priceRange[1],
-  )
+  const filteredProducts = products && Array.isArray(products) ? products.filter(
+    (product: any) => product && product.price >= priceRange[0] && product.price <= priceRange[1],
+  ) : []
 
   return (
     <ClientOnly>
@@ -111,7 +111,7 @@ export default function ShopPage() {
               {/* Toolbar */}
               <div className="flex justify-between items-center mb-8">
                 <p className="text-gray-600">
-                  Showing {filteredProducts.length} of {products ? products.length : 0} products
+                  Showing {filteredProducts && Array.isArray(filteredProducts) ? filteredProducts.length : 0} of {products && Array.isArray(products) ? products.length : 0} products
                 </p>
                 <div className="flex items-center gap-2">
                   <Button
@@ -138,7 +138,7 @@ export default function ShopPage() {
                 <div className="text-center py-12 text-gray-500">Loading products...</div>
               ) : (
                 <div className={`grid gap-8 ${viewMode === "grid" ? "md:grid-cols-2 xl:grid-cols-3" : "grid-cols-1"}`}>
-                  {filteredProducts.map((product: any) => (
+                  {filteredProducts && Array.isArray(filteredProducts) && filteredProducts.map((product: any) => (
                     <Card
                       key={product.id}
                       className="group cursor-pointer border-0 shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden bg-white"

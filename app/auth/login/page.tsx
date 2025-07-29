@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Loader2 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { signIn } from "next-auth/react"
 import type { CheckedState } from "@radix-ui/react-checkbox"
 
@@ -23,6 +23,8 @@ export default function LoginPage() {
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get('callbackUrl') || '/account'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -37,7 +39,7 @@ export default function LoginPage() {
     if (res?.error) {
       setError("Invalid email or password")
     } else {
-      router.push("/account")
+      router.push(callbackUrl)
     }
   }
 
@@ -75,7 +77,7 @@ export default function LoginPage() {
                 type="button"
                 variant="outline"
                 className="w-full h-12 border-gray-300 hover:border-gray-400 transition-colors bg-transparent"
-                onClick={() => signIn("google", { callbackUrl: "/account" })}
+                onClick={() => signIn("google", { callbackUrl })}
                 disabled={isLoading}
               >
                 <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">

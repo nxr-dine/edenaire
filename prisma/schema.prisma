@@ -60,6 +60,8 @@ model Product {
   name        String
   description String?
   price       Float
+  quantity    Int         @default(0)
+  discount    Float       @default(0.0)
   image       String?
   categoryId  String?
   createdAt   DateTime    @default(now())

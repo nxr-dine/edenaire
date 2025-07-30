@@ -51,7 +51,7 @@ export default function SubscriptionPage() {
         "Priority customer support",
         "Free worldwide shipping",
         "Exclusive collection previews",
-        "Quarterly style consultations",
+        "Exclusive member events",
         "Member-only events",
         "10% discount on all purchases",
       ],

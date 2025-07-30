@@ -44,7 +44,7 @@ const tiers = [
       "Priority customer support",
       "Early access to new collections",
       "Complimentary jewelry cleaning",
-      "Personal style consultation",
+      "Exclusive member benefits",
     ],
     color: "from-yellow-400 to-yellow-600",
     bgColor: "bg-yellow-50",
@@ -557,7 +557,7 @@ export default function HomePage() {
                 variant="outline"
                 className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-black px-8 py-3 text-lg bg-transparent"
               >
-                Schedule Consultation
+                Join VIP Membership
               </Button>
             </Link>
           </div>

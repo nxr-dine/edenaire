@@ -5,7 +5,25 @@ import { authOptions } from '../auth/[...nextauth]/route'
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    const body = await request.json()
+    
+    // Check if request has content
+    const contentType = request.headers.get('content-type')
+    if (!contentType || !contentType.includes('application/json')) {
+      return NextResponse.json(
+        { error: 'Content-Type must be application/json' },
+        { status: 400 }
+      )
+    }
+    
+    let body
+    try {
+      body = await request.json()
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      )
+    }
     
     const { name, email, phone, service, message } = body
 
@@ -39,12 +57,12 @@ export async function POST(request: NextRequest) {
 
     // Service validation
     const validServices = [
-      "Personal Consultation",
+      "General Inquiry",
       "Bespoke Design", 
       "Jewelry Appraisal",
       "Repair Services",
       "Collection Viewing",
-      "Investment Consultation"
+      "Product Information"
     ]
 
     if (service && !validServices.includes(service)) {

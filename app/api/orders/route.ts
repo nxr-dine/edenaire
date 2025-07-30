@@ -6,31 +6,48 @@ import { authOptions } from "../auth/[...nextauth]/route"
 const prisma = new PrismaClient()
 
 export async function GET(req: Request) {
-  const session = await getServerSession(authOptions)
-  if (!session || !session.user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
   try {
-    const user = await prisma.user.findUnique({ where: { email: session.user.email } })
-    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 })
+    const session = await getServerSession(authOptions)
     
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true },
+    })
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
+    }
+
     const orders = await prisma.order.findMany({
       where: { userId: user.id },
-      include: { 
-        items: { 
-          include: { 
-            product: {
-              include: { category: true }
-            } 
-          } 
-        } 
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
     })
-    return NextResponse.json(orders)
+
+    // Transform orders for the frontend
+    const transformedOrders = orders.map((order) => ({
+      id: order.id,
+      date: order.createdAt.toISOString(),
+      total: `$${order.total.toFixed(2)}`,
+      status: order.status,
+      statusColor: order.status === "delivered" ? "green" : order.status === "shipped" ? "blue" : "yellow",
+      items: order.items.map((item) => item.product.name),
+    }))
+
+    return NextResponse.json(transformedOrders)
   } catch (error) {
-    console.error("Orders fetch error:", error)
-    return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 })
+    console.error("Orders GET error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 

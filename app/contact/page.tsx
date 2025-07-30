@@ -77,12 +77,12 @@ export default function ContactPage() {
   }
 
   const services = [
-    "Personal Consultation",
+    "General Inquiry",
     "Bespoke Design",
     "Jewelry Appraisal",
     "Repair Services",
     "Collection Viewing",
-    "Investment Consultation",
+    "Product Information",
   ]
 
   const locations = [
@@ -135,7 +135,7 @@ export default function ContactPage() {
               <h2 className="text-3xl font-light mb-4 text-gray-900">Get in Touch</h2>
               <p className="text-lg text-gray-600">
                 Our dedicated concierge team is here to assist you with any inquiries or to schedule a private
-                consultation.
+                inquiry.
               </p>
             </div>
 
@@ -297,7 +297,7 @@ export default function ContactPage() {
                   <Calendar className="h-5 w-5 mr-3" />
                   <div className="text-left">
                     <div className="font-medium">Book Appointment</div>
-                    <div className="text-sm text-gray-500">Schedule a private consultation</div>
+                    <div className="text-sm text-gray-500">Get in touch with our team</div>
                   </div>
                 </Button>
 

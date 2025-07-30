@@ -210,7 +210,7 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-light mb-6 text-gray-900">Experience Edenaire</h2>
           <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-            Discover how our passion for perfection can bring your vision to life. Schedule a private consultation with
+            Discover how our passion for perfection can bring your vision to life. Connect with
             our master jewelers.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -219,7 +219,7 @@ export default function AboutPage() {
                 size="lg"
                 className="bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black px-8 py-4 text-lg"
               >
-                Book Consultation
+                Contact Us
               </Button>
             </Link>
             <Link href="/shop">

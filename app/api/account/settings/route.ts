@@ -1,49 +1,53 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
+import { PrismaClient } from "@/lib/generated/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../../auth/[...nextauth]/route"
-import { PrismaClient } from "@/lib/generated/prisma"
 
 const prisma = new PrismaClient()
 
-export async function PUT(req: NextRequest) {
+export async function PUT(req: Request) {
   try {
     const session = await getServerSession(authOptions)
-    console.log("[SETTINGS] Session:", session)
     
-    if (!session?.user?.id) {
-      console.error("[SETTINGS] No user ID in session")
+    if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const body = await req.json()
-    console.log("[SETTINGS] Request body:", body)
     const { personalInfo, notifications } = body
 
-    // Update user personal information
-    if (personalInfo) {
-      await prisma.user.update({
-        where: { id: session.user.id },
-        data: {
-          name: `${personalInfo.firstName} ${personalInfo.lastName}`,
-          phone: personalInfo.phone || null,
-          // Note: email updates might need special handling for verification
-        }
-      })
-    }
-
-    // Update notification preferences (you might want to create a separate table for this)
-    // For now, we'll store it in a JSON field or create a UserPreferences model
-    
-    return NextResponse.json({ 
-      success: true, 
-      message: "Settings updated successfully" 
+    // Update user profile
+    const updatedUser = await prisma.user.update({
+      where: { email: session.user.email },
+      data: {
+        name: personalInfo.firstName && personalInfo.lastName 
+          ? `${personalInfo.firstName} ${personalInfo.lastName}` 
+          : undefined,
+        phone: personalInfo.phone || undefined,
+        address: personalInfo.address || undefined,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        address: true,
+        tier: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     })
 
+    // In a real application, you would also save notification preferences
+    // For now, we'll just return success
+
+    return NextResponse.json({
+      message: "Settings updated successfully",
+      user: updatedUser
+    })
   } catch (error) {
-    console.error("[SETTINGS] Update error:", error)
-    return NextResponse.json(
-      { error: error?.message || "Failed to update settings" }, 
-      { status: 500 }
-    )
+    console.error("Settings update error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 } 

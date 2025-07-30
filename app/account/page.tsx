@@ -19,7 +19,6 @@ import {
   Star,
   Download,
   Eye,
-  Calendar,
   Shield,
   Bell,
   LogOut,
@@ -36,6 +35,7 @@ import { useToast } from "@/hooks/use-toast"
 import { PasswordChangeModal } from "@/components/password-change-modal"
 import { DeleteAccountModal } from "@/components/delete-account-modal"
 import { mutate } from "swr"
+import { useAuth } from "@/contexts/auth-context"
 
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
@@ -52,6 +52,7 @@ export default function AccountPage() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("overview")
   const { toast } = useToast()
+  const { refreshUser } = useAuth()
 
   // Settings state
   const [formData, setFormData] = useState({
@@ -67,6 +68,7 @@ export default function AccountPage() {
     marketing: true
   })
   const [isSaving, setIsSaving] = useState(false)
+  const [isUpdatingSubscription, setIsUpdatingSubscription] = useState(false)
 
   // Modal states
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false)
@@ -91,9 +93,11 @@ export default function AccountPage() {
   // Update form data when profile loads
   useEffect(() => {
     if (profile) {
+      const [firstName, ...lastNameParts] = (profile.name || "").split(" ")
+      const lastName = lastNameParts.join(" ")
       setFormData({
-        firstName: profile.firstName || "Isabella",
-        lastName: profile.lastName || "Rodriguez",
+        firstName: firstName || "Isabella",
+        lastName: lastName || "Rodriguez",
         email: profile.email || "",
         phone: profile.phone || "",
         address: profile.address || ""
@@ -126,6 +130,10 @@ export default function AccountPage() {
 
       if (response.ok) {
         toast({ title: "Settings saved successfully!" })
+        // Refresh profile data to show updated information
+        mutate("/api/account", undefined, { revalidate: true })
+        // Refresh auth context to update dropdown menu
+        refreshUser()
       } else {
         toast({ title: data.error || "Failed to save settings", variant: "destructive" })
       }
@@ -170,25 +178,31 @@ export default function AccountPage() {
   }
 
   // Subscription management functions
-  const handleUpgradeSubscription = async () => {
+  const handleUpgradeSubscription = async (targetTier: string) => {
+    setIsUpdatingSubscription(true)
     try {
       const response = await fetch("/api/subscription", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tier: "Ultra-Exclusive" })
+        body: JSON.stringify({ tier: targetTier })
       })
 
       const data = await response.json()
 
       if (response.ok) {
-        toast({ title: "Successfully upgraded to Ultra-Exclusive!" })
-        // Refresh subscription data without triggering other refetches
-        mutate("/api/subscription", data, { revalidate: false })
+        toast({ title: `Successfully upgraded to ${targetTier}!` })
+        // Refresh subscription data and profile data
+        mutate("/api/subscription", undefined, { revalidate: true })
+        mutate("/api/account", undefined, { revalidate: true })
+        // Refresh auth context to update dropdown
+        refreshUser()
       } else {
         toast({ title: data.error || "Failed to upgrade subscription", variant: "destructive" })
       }
     } catch (error) {
       toast({ title: "Failed to upgrade subscription", variant: "destructive" })
+    } finally {
+      setIsUpdatingSubscription(false)
     }
   }
 
@@ -197,6 +211,7 @@ export default function AccountPage() {
       return
     }
 
+    setIsUpdatingSubscription(true)
     try {
       const response = await fetch("/api/subscription", {
         method: "DELETE"
@@ -206,13 +221,35 @@ export default function AccountPage() {
 
       if (response.ok) {
         toast({ title: "Subscription cancelled successfully" })
-        // Refresh subscription data without triggering other refetches
-        mutate("/api/subscription", { subscription: { ...subscription, status: "cancelled" } }, { revalidate: false })
+        // Refresh subscription data and profile data
+        mutate("/api/subscription", undefined, { revalidate: true })
+        mutate("/api/account", undefined, { revalidate: true })
+        // Refresh auth context to update dropdown
+        refreshUser()
       } else {
         toast({ title: data.error || "Failed to cancel subscription", variant: "destructive" })
       }
     } catch (error) {
       toast({ title: "Failed to cancel subscription", variant: "destructive" })
+    } finally {
+      setIsUpdatingSubscription(false)
+    }
+  }
+
+  const handleUpdatePaymentMethod = async () => {
+    try {
+      // In a real application, this would integrate with a payment processor
+      // For now, we'll simulate the process
+      toast({ title: "Redirecting to payment method update..." })
+      
+      // Simulate a delay for the payment update process
+      setTimeout(() => {
+        toast({ title: "Payment method updated successfully!" })
+        // Refresh subscription data to show updated payment info
+        mutate("/api/subscription", undefined, { revalidate: true })
+      }, 2000)
+    } catch (error) {
+      toast({ title: "Failed to update payment method", variant: "destructive" })
     }
   }
 
@@ -246,6 +283,8 @@ export default function AccountPage() {
         return "from-yellow-400 to-yellow-600"
       case "purple":
         return "from-purple-600 to-indigo-800"
+      case "blue":
+        return "from-blue-600 to-purple-600"
       default:
         return "from-gray-400 to-gray-600"
     }
@@ -434,17 +473,21 @@ export default function AccountPage() {
                         <CardTitle>Quick Actions</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
-                        <Button variant="outline" className="w-full justify-start bg-transparent">
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start bg-transparent"
+                          onClick={() => setActiveTab("orders")}
+                        >
                           <Eye className="h-4 w-4 mr-2" />
                           Track Orders
                         </Button>
-                        <Button variant="outline" className="w-full justify-start bg-transparent">
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start bg-transparent"
+                          onClick={() => setActiveTab("wishlist")}
+                        >
                           <Heart className="h-4 w-4 mr-2" />
                           View Wishlist
-                        </Button>
-                        <Button variant="outline" className="w-full justify-start bg-transparent">
-                          <Calendar className="h-4 w-4 mr-2" />
-                          Book Consultation
                         </Button>
                       </CardContent>
                     </Card>
@@ -488,11 +531,38 @@ export default function AccountPage() {
                               <div className="text-gray-900">{order.items.join(", ")}</div>
                             </div>
                             <div className="flex flex-col sm:flex-row gap-3">
-                              <Button variant="outline" size="sm">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => toast({ title: `Order details for ${order.id}`, description: `Status: ${order.status}, Total: ${order.total}` })}
+                              >
                                 <Eye className="h-4 w-4 mr-2" />
                                 View Details
                               </Button>
-                              <Button variant="outline" size="sm">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => {
+                                  // Generate receipt data
+                                  const receiptData = {
+                                    orderId: order.id,
+                                    date: order.date,
+                                    items: order.items,
+                                    total: order.total,
+                                    status: order.status
+                                  }
+                                  const blob = new Blob([JSON.stringify(receiptData, null, 2)], { type: "application/json" })
+                                  const url = URL.createObjectURL(blob)
+                                  const a = document.createElement("a")
+                                  a.href = url
+                                  a.download = `receipt-${order.id}.json`
+                                  document.body.appendChild(a)
+                                  a.click()
+                                  document.body.removeChild(a)
+                                  URL.revokeObjectURL(url)
+                                  toast({ title: "Receipt downloaded!" })
+                                }}
+                              >
                                 <Download className="h-4 w-4 mr-2" />
                                 Download Receipt
                               </Button>
@@ -545,10 +615,45 @@ export default function AccountPage() {
                               <Button
                                 size="sm"
                                 className="flex-1 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black"
+                                onClick={async () => {
+                                  try {
+                                    const response = await fetch("/api/cart", {
+                                      method: "POST",
+                                      headers: { "Content-Type": "application/json" },
+                                      body: JSON.stringify({ productId: item.id, quantity: 1 })
+                                    })
+                                    if (response.ok) {
+                                      toast({ title: "Added to cart!" })
+                                    } else {
+                                      toast({ title: "Failed to add to cart", variant: "destructive" })
+                                    }
+                                  } catch (error) {
+                                    toast({ title: "Failed to add to cart", variant: "destructive" })
+                                  }
+                                }}
                               >
                                 Add to Cart
                               </Button>
-                              <Button variant="outline" size="sm">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={async () => {
+                                  try {
+                                    const response = await fetch(`/api/wishlist?productId=${item.id}`, {
+                                      method: "DELETE"
+                                    })
+                                    if (response.ok) {
+                                      toast({ title: "Removed from wishlist!" })
+                                      // Refresh wishlist data
+                                      mutate("/api/wishlist")
+                                    } else {
+                                      toast({ title: "Failed to remove from wishlist", variant: "destructive" })
+                                    }
+                                  } catch (error) {
+                                    toast({ title: "Failed to remove from wishlist", variant: "destructive" })
+                                  }
+                                }}
+                              >
                                 <Heart className="h-4 w-4 fill-current text-red-500" />
                               </Button>
                             </div>
@@ -591,7 +696,9 @@ export default function AccountPage() {
                             {subscription?.tier || profile.currentTier || "No Active Subscription"}
                           </h3>
                           <p className="text-gray-600">
-                            {subscription?.tier === "Ultra-Exclusive" ? "$299/month" : "$199/month"}
+                            {subscription?.tier === "Ultra-Exclusive" ? "$299/month" : 
+                             subscription?.tier === "Prestige Collection" ? "$199/month" : 
+                             "Free"}
                           </p>
                           {subscription && (
                             <p className="text-sm text-gray-500 mt-1">
@@ -641,26 +748,64 @@ export default function AccountPage() {
                           <div className="flex justify-between">
                             <span className="text-gray-600">Amount:</span>
                             <span className="text-gray-900">
-                              {subscription?.tier === "Ultra-Exclusive" ? "$299.00" : "$199.00"}
+                              {subscription?.tier === "Ultra-Exclusive" ? "$299.00" : 
+                               subscription?.tier === "Prestige Collection" ? "$199.00" : 
+                               "Free"}
                             </span>
                           </div>
                         </div>
 
                         <div className="space-y-3">
                           {!subscription || subscription.status !== "active" ? (
-                            <Button
-                              className="w-full bg-gradient-to-r from-purple-600 to-indigo-800 hover:from-purple-500 hover:to-indigo-700 text-white"
-                              onClick={handleUpgradeSubscription}
-                            >
-                              Subscribe to Ultra-Exclusive
-                            </Button>
-                          ) : subscription.tier !== "Ultra-Exclusive" ? (
-                            <Button
-                              className="w-full bg-gradient-to-r from-purple-600 to-indigo-800 hover:from-purple-500 hover:to-indigo-700 text-white"
-                              onClick={handleUpgradeSubscription}
-                            >
-                              Upgrade to Ultra-Exclusive
-                            </Button>
+                            <div className="space-y-2">
+                              <Button
+                                className="w-full bg-gradient-to-r from-purple-600 to-indigo-800 hover:from-purple-500 hover:to-indigo-700 text-white"
+                                onClick={() => handleUpgradeSubscription("Ultra-Exclusive")}
+                                disabled={isUpdatingSubscription}
+                              >
+                                {isUpdatingSubscription ? "Processing..." : "Subscribe to Ultra-Exclusive - $299/month"}
+                              </Button>
+                              <Button
+                                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
+                                onClick={() => handleUpgradeSubscription("Prestige Collection")}
+                                disabled={isUpdatingSubscription}
+                              >
+                                {isUpdatingSubscription ? "Processing..." : "Subscribe to Prestige Collection - $199/month"}
+                              </Button>
+                            </div>
+                          ) : subscription.tier === "iconic" ? (
+                            <div className="space-y-2">
+                              <Button
+                                className="w-full bg-gradient-to-r from-purple-600 to-indigo-800 hover:from-purple-500 hover:to-indigo-700 text-white"
+                                onClick={() => handleUpgradeSubscription("Ultra-Exclusive")}
+                                disabled={isUpdatingSubscription}
+                              >
+                                {isUpdatingSubscription ? "Processing..." : "Upgrade to Ultra-Exclusive - $299/month"}
+                              </Button>
+                              <Button
+                                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
+                                onClick={() => handleUpgradeSubscription("Prestige Collection")}
+                                disabled={isUpdatingSubscription}
+                              >
+                                {isUpdatingSubscription ? "Processing..." : "Upgrade to Prestige Collection - $199/month"}
+                              </Button>
+                            </div>
+                          ) : subscription.tier === "Prestige Collection" ? (
+                            <div className="space-y-2">
+                              <Button
+                                className="w-full bg-gradient-to-r from-purple-600 to-indigo-800 hover:from-purple-500 hover:to-indigo-700 text-white"
+                                onClick={() => handleUpgradeSubscription("Ultra-Exclusive")}
+                                disabled={isUpdatingSubscription}
+                              >
+                                {isUpdatingSubscription ? "Processing..." : "Upgrade to Ultra-Exclusive - $299/month"}
+                              </Button>
+                              <Button
+                                className="w-full bg-green-600 hover:bg-green-700 text-white"
+                                disabled
+                              >
+                                Already Prestige Collection
+                              </Button>
+                            </div>
                           ) : (
                             <Button
                               className="w-full bg-green-600 hover:bg-green-700 text-white"
@@ -672,7 +817,7 @@ export default function AccountPage() {
                           <Button
                             variant="outline"
                             className="w-full bg-transparent"
-                            onClick={() => toast({ title: "Update Payment Method (demo)" })}
+                            onClick={handleUpdatePaymentMethod}
                           >
                             Update Payment Method
                           </Button>
@@ -681,8 +826,9 @@ export default function AccountPage() {
                               variant="outline"
                               className="w-full text-red-600 hover:text-red-700 bg-transparent"
                               onClick={handleCancelSubscription}
+                              disabled={isUpdatingSubscription}
                             >
-                              Cancel Subscription
+                              {isUpdatingSubscription ? "Processing..." : "Cancel Subscription"}
                             </Button>
                           )}
                         </div>

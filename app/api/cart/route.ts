@@ -6,111 +6,119 @@ import { authOptions } from "../auth/[...nextauth]/route"
 const prisma = new PrismaClient()
 
 export async function GET(req: Request) {
-  const session = await getServerSession(authOptions)
-  if (!session || !session.user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
   try {
-    const user = await prisma.user.findUnique({ where: { email: session.user.email } })
-    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 })
+    const session = await getServerSession(authOptions)
     
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true },
+    })
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
+    }
+
     const cart = await prisma.cart.findUnique({
       where: { userId: user.id },
-      include: { 
-        items: { 
-          include: { 
-            product: {
-              include: { category: true }
-            } 
-          } 
-        } 
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
       },
     })
-    
+
     if (!cart) {
-      // Create empty cart if it doesn't exist
-      const newCart = await prisma.cart.create({
-        data: { userId: user.id },
-        include: { items: { include: { product: { include: { category: true } } } } }
-      })
-      return NextResponse.json(newCart)
+      return NextResponse.json({ items: [], total: 0 })
     }
-    
-    return NextResponse.json(cart)
+
+    const total = cart.items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0)
+
+    return NextResponse.json({
+      items: cart.items.map(item => ({
+        id: item.id,
+        productId: item.productId,
+        name: item.product.name,
+        price: item.product.price,
+        quantity: item.quantity,
+        image: item.product.image,
+      })),
+      total,
+    })
   } catch (error) {
-    console.error("Cart fetch error:", error)
-    return NextResponse.json({ error: "Failed to fetch cart" }, { status: 500 })
+    console.error("Cart GET error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions)
-  if (!session || !session.user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
   try {
-    const user = await prisma.user.findUnique({ where: { email: session.user.email } })
-    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 })
+    const session = await getServerSession(authOptions)
     
-    const { productId, quantity } = await req.json()
-    
-    // Validate required fields
-    if (!productId || !quantity) {
-      return NextResponse.json({ error: "Product ID and quantity are required" }, { status: 400 })
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
-    
-    // Validate quantity
-    if (typeof quantity !== 'number' || quantity <= 0 || quantity > 99) {
-      return NextResponse.json({ error: "Quantity must be a positive number between 1 and 99" }, { status: 400 })
+
+    const body = await req.json()
+    const { productId, quantity = 1 } = body
+
+    if (!productId) {
+      return NextResponse.json({ error: "Product ID is required" }, { status: 400 })
     }
-    
-    // Check if product exists
-    const product = await prisma.product.findUnique({
-      where: { id: productId }
+
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true },
     })
-    
-    if (!product) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 })
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
-    
+
     // Get or create cart
-    let cart = await prisma.cart.findUnique({ where: { userId: user.id } })
-    if (!cart) {
-      cart = await prisma.cart.create({ data: { userId: user.id } })
-    }
-    
-    // Check if item already exists in cart
-    const existingItem = await prisma.cartItem.findFirst({ 
-      where: { cartId: cart.id, productId } 
+    let cart = await prisma.cart.findUnique({
+      where: { userId: user.id },
     })
-    
-    let cartItem
+
+    if (!cart) {
+      cart = await prisma.cart.create({
+        data: { userId: user.id },
+      })
+    }
+
+    // Check if item already exists in cart
+    const existingItem = await prisma.cartItem.findFirst({
+      where: {
+        cartId: cart.id,
+        productId,
+      },
+    })
+
     if (existingItem) {
-      // Update existing item
-      cartItem = await prisma.cartItem.update({
+      // Update quantity
+      await prisma.cartItem.update({
         where: { id: existingItem.id },
-        data: { 
-          quantity,
-          productPrice: product.price // Update price in case it changed
-        },
-        include: { product: { include: { category: true } } }
+        data: { quantity: existingItem.quantity + quantity },
       })
     } else {
-      // Create new item
-      cartItem = await prisma.cartItem.create({
+      // Add new item
+      await prisma.cartItem.create({
         data: {
           cartId: cart.id,
           productId,
           quantity,
-          productPrice: product.price
         },
-        include: { product: { include: { category: true } } }
       })
     }
-    
-    return NextResponse.json(cartItem, { status: 201 })
+
+    return NextResponse.json({ message: "Item added to cart" })
   } catch (error) {
-    console.error("Cart update error:", error)
-    return NextResponse.json({ error: "Failed to update cart" }, { status: 500 })
+    console.error("Cart POST error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 } 

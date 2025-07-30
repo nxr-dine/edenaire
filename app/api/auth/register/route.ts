@@ -11,6 +11,12 @@ export async function POST(req: Request) {
     if (!email || !password || !firstName || !lastName) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: "Please provide a valid email address" }, { status: 400 })
+    }
     const existingUser = await prisma.user.findUnique({ where: { email } })
     if (existingUser) {
       return NextResponse.json({ error: "User already exists" }, { status: 409 })

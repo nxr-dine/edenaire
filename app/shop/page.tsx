@@ -6,12 +6,14 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
-import { Heart, Eye, ShoppingBag, Filter, Grid, List } from "lucide-react"
+import { Heart, Eye, ShoppingBag, Filter, Grid, List, Crown, Diamond, Star } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { ClientOnly } from "@/components/client-only"
+import { useAuth } from "@/contexts/auth-context"
+import { calculateDiscountedPrice, getSubscriptionBenefits, getTierBadgeColor, getTierDisplayName } from "@/lib/subscription-utils"
 import useSWR from "swr"
 
 const fetcher = (url: string) => fetch(url).then(res => res.json())
@@ -19,12 +21,29 @@ const fetcher = (url: string) => fetch(url).then(res => res.json())
 export default function ShopPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [priceRange, setPriceRange] = useState([0, 100000])
+  const { user } = useAuth()
 
   const { data: products, isLoading } = useSWR("/api/products", fetcher)
 
   const filteredProducts = products && Array.isArray(products) ? products.filter(
     (product: any) => product && product.price >= priceRange[0] && product.price <= priceRange[1],
   ) : []
+
+  const userTier = user?.tier || "iconic"
+  const benefits = getSubscriptionBenefits(userTier)
+
+  const getTierIcon = (tier: string) => {
+    switch (tier) {
+      case "Ultra-Exclusive":
+        return Crown
+      case "Prestige Collection":
+        return Diamond
+      default:
+        return Star
+    }
+  }
+
+  const TierIcon = getTierIcon(userTier)
 
   return (
     <ClientOnly>
@@ -108,6 +127,19 @@ export default function ShopPage() {
 
             {/* Products Grid */}
             <div className="flex-1">
+              {/* Subscription Benefits Banner */}
+              {benefits.discountPercentage > 0 && (
+                <div className={`mb-6 p-4 rounded-lg ${getTierBadgeColor(userTier)} text-center`}>
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <TierIcon className="h-5 w-5" />
+                    <span className="font-medium">{getTierDisplayName(userTier)} Member</span>
+                  </div>
+                  <p className="text-sm">
+                    Enjoy {benefits.discountPercentage}% off all products + {benefits.shippingType} shipping
+                  </p>
+                </div>
+              )}
+
               {/* Toolbar */}
               <div className="flex justify-between items-center mb-8">
                 <p className="text-gray-600">
@@ -171,11 +203,20 @@ export default function ShopPage() {
                         {viewMode === "list" && <p className="text-gray-600 mb-4">{product.description}</p>}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <span className="text-xl font-light text-gray-900">${product.price.toLocaleString()}</span>
-                            {product.originalPrice && (
-                              <span className="text-sm text-gray-500 line-through">
-                                ${product.originalPrice.toLocaleString()}
-                              </span>
+                            {benefits.discountPercentage > 0 ? (
+                              <>
+                                <span className="text-xl font-light text-gray-900">
+                                  ${calculateDiscountedPrice(product.price, userTier).toLocaleString()}
+                                </span>
+                                <span className="text-sm text-gray-500 line-through">
+                                  ${product.price.toLocaleString()}
+                                </span>
+                                <Badge className={`text-xs ${getTierBadgeColor(userTier)}`}>
+                                  {benefits.discountPercentage}% OFF
+                                </Badge>
+                              </>
+                            ) : (
+                              <span className="text-xl font-light text-gray-900">${product.price.toLocaleString()}</span>
                             )}
                           </div>
                           <Link href={`/product/${product.id}`}>

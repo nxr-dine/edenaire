@@ -4,8 +4,8 @@ if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('STRIPE_SECRET_KEY is not set in environment variables');
 }
 
-if (!process.env.STRIPE_PUBLISHABLE_KEY) {
-  throw new Error('STRIPE_PUBLISHABLE_KEY is not set in environment variables');
+if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+  throw new Error('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not set in environment variables');
 }
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
@@ -14,7 +14,7 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 export const stripeConfig = {
-  publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+  publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
   secretKey: process.env.STRIPE_SECRET_KEY,
 };
 

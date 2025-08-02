@@ -91,7 +91,9 @@ export default function Header() {
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        isScrolled ? "bg-white/95 backdrop-blur-md shadow-lg" : "bg-transparent",
+        isScrolled 
+          ? "bg-white/95 backdrop-blur-md shadow-lg" 
+          : "bg-black/20 backdrop-blur-sm"
       )}
     >
 
@@ -99,7 +101,10 @@ export default function Header() {
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <div className="text-xl sm:text-2xl font-light tracking-wider text-gray-900">
+            <div className={cn(
+              "text-xl sm:text-2xl font-light tracking-wider transition-colors duration-300",
+              isScrolled ? "text-gray-900" : "text-white"
+            )}>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-700">EDEN</span>
               AIRE
             </div>
@@ -109,25 +114,45 @@ export default function Header() {
           <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
             <Link
               href="/"
-              className="text-gray-700 hover:text-yellow-600 transition-colors font-medium text-sm uppercase tracking-wider"
+              className={cn(
+                "transition-colors font-medium text-sm uppercase tracking-wider",
+                isScrolled 
+                  ? "text-gray-700 hover:text-yellow-600" 
+                  : "text-white/90 hover:text-yellow-400"
+              )}
             >
               Home
             </Link>
             <Link
               href="/shop"
-              className="text-gray-700 hover:text-yellow-600 transition-colors font-medium text-sm uppercase tracking-wider"
+              className={cn(
+                "transition-colors font-medium text-sm uppercase tracking-wider",
+                isScrolled 
+                  ? "text-gray-700 hover:text-yellow-600" 
+                  : "text-white/90 hover:text-yellow-400"
+              )}
             >
               Collections
             </Link>
             <button
               onClick={() => scrollToSection("about")}
-              className="text-gray-700 hover:text-yellow-600 transition-colors font-medium text-sm uppercase tracking-wider cursor-pointer"
+              className={cn(
+                "transition-colors font-medium text-sm uppercase tracking-wider cursor-pointer",
+                isScrolled 
+                  ? "text-gray-700 hover:text-yellow-600" 
+                  : "text-white/90 hover:text-yellow-400"
+              )}
             >
               About
             </button>
             <Link
               href="/contact"
-              className="text-gray-700 hover:text-yellow-600 transition-colors font-medium text-sm uppercase tracking-wider"
+              className={cn(
+                "transition-colors font-medium text-sm uppercase tracking-wider",
+                isScrolled 
+                  ? "text-gray-700 hover:text-yellow-600" 
+                  : "text-white/90 hover:text-yellow-400"
+              )}
             >
               Contact
             </Link>
@@ -139,7 +164,12 @@ export default function Header() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-gray-700 hover:text-yellow-600 p-2"
+                className={cn(
+                  "p-2 transition-colors",
+                  isScrolled 
+                    ? "text-gray-700 hover:text-yellow-600" 
+                    : "text-white/90 hover:text-yellow-400"
+                )}
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
               >
                 <Search className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -173,7 +203,16 @@ export default function Header() {
             </div>
 
             <Link href="/wishlist">
-              <Button variant="ghost" size="sm" className="text-gray-700 hover:text-yellow-600 p-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className={cn(
+                  "p-2 transition-colors",
+                  isScrolled 
+                    ? "text-gray-700 hover:text-yellow-600" 
+                    : "text-white/90 hover:text-yellow-400"
+                )}
+              >
                 <Heart className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </Link>
@@ -182,7 +221,16 @@ export default function Header() {
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-gray-700 hover:text-yellow-600 p-1">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className={cn(
+                      "p-1 transition-colors",
+                      isScrolled 
+                        ? "text-gray-700 hover:text-yellow-600" 
+                        : "text-white/90 hover:text-yellow-400"
+                    )}
+                  >
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black text-sm">
                         {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || "U"}
@@ -228,7 +276,12 @@ export default function Header() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-gray-700 hover:text-yellow-600 p-2 flex items-center gap-2"
+                  className={cn(
+                    "p-2 flex items-center gap-2 transition-colors",
+                    isScrolled 
+                      ? "text-gray-700 hover:text-yellow-600" 
+                      : "text-white/90 hover:text-yellow-400"
+                  )}
                 >
                   <LogIn className="h-4 w-4 sm:h-5 sm:w-5" />
                   <span className="hidden xl:inline text-sm">Login</span>
@@ -237,7 +290,16 @@ export default function Header() {
             )}
 
             <Link href="/cart">
-              <Button variant="ghost" size="sm" className="text-gray-700 hover:text-yellow-600 relative p-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className={cn(
+                  "relative p-2 transition-colors",
+                  isScrolled 
+                    ? "text-gray-700 hover:text-yellow-600" 
+                    : "text-white/90 hover:text-yellow-400"
+                )}
+              >
                 <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5" />
                 {cartItemCount > 0 && (
                   <Badge className="absolute -top-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 p-0 bg-yellow-500 text-black text-xs flex items-center justify-center font-bold">
@@ -252,7 +314,12 @@ export default function Header() {
           <Button
             variant="ghost"
             size="sm"
-            className="lg:hidden text-gray-700 p-2"
+            className={cn(
+              "lg:hidden p-2 transition-colors",
+              isScrolled 
+                ? "text-gray-700" 
+                : "text-white/90"
+            )}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X className="h-5 w-5 sm:h-6 sm:w-6" /> : <Menu className="h-5 w-5 sm:h-6 sm:w-6" />}

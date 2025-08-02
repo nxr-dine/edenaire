@@ -1,59 +1,69 @@
 import { NextResponse } from "next/server"
 import { PrismaClient } from "@/lib/generated/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "../../auth/[...nextauth]/route"
+import { auth } from "@/lib/auth"
 
 const prisma = new PrismaClient()
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   try {
+    const session = await auth()
+    
     const category = await prisma.category.findUnique({
       where: { id: params.id },
-      include: { products: true }
+      include: {
+        products: true,
+      },
     })
-    
+
     if (!category) {
       return NextResponse.json({ error: "Category not found" }, { status: 404 })
     }
-    
+
     return NextResponse.json(category)
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch category" }, { status: 500 })
+    console.error("Category GET error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions)
-  if (!session || session.user?.role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+export async function PUT(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   try {
-    const { name } = await req.json()
+    const session = await auth()
+    
+    if (!session?.user?.role || session.user.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const body = await req.json()
+    const { name } = body
+
     if (!name) {
-      return NextResponse.json({ error: "Missing category name" }, { status: 400 })
+      return NextResponse.json({ error: "Name is required" }, { status: 400 })
     }
-    
-    // Check if category exists
-    const existingCategory = await prisma.category.findUnique({
-      where: { id: params.id }
-    })
-    
-    if (!existingCategory) {
-      return NextResponse.json({ error: "Category not found" }, { status: 404 })
-    }
-    
-    const category = await prisma.category.update({
+
+    const updatedCategory = await prisma.category.update({
       where: { id: params.id },
       data: { name },
+      include: {
+        products: true,
+      },
     })
-    return NextResponse.json(category)
+
+    return NextResponse.json(updatedCategory)
   } catch (error) {
-    return NextResponse.json({ error: "Failed to update category" }, { status: 500 })
+    console.error("Category PUT error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions)
+  const session = await auth()
   if (!session || session.user?.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }

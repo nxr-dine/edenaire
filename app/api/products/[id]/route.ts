@@ -1,83 +1,73 @@
 import { NextResponse } from "next/server"
 import { PrismaClient } from "@/lib/generated/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "../../auth/[...nextauth]/route"
+import { auth } from "@/lib/auth"
 
 const prisma = new PrismaClient()
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   try {
+    const session = await auth()
+    
     const product = await prisma.product.findUnique({
       where: { id: params.id },
-      include: { category: true },
+      include: {
+        category: true,
+      },
     })
+
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 })
     }
+
     return NextResponse.json(product)
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 })
+    console.error("Product GET error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions)
-  if (!session || session.user?.role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+export async function PUT(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   try {
+    const session = await auth()
+    
+    if (!session?.user?.role || session.user.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
     const body = await req.json()
-    const { name, description, price, image, categoryId } = body
-    
-    // Validate required fields
-    if (!name || !price) {
-      return NextResponse.json({ error: "Name and price are required" }, { status: 400 })
-    }
-    
-    // Validate price is a positive number
-    if (typeof price !== 'number' || price <= 0) {
-      return NextResponse.json({ error: "Price must be a positive number" }, { status: 400 })
-    }
-    
-    // Check if product exists
-    const existingProduct = await prisma.product.findUnique({
-      where: { id: params.id }
-    })
-    
-    if (!existingProduct) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 })
-    }
-    
-    // Validate category exists if provided
-    if (categoryId) {
-      const category = await prisma.category.findUnique({
-        where: { id: categoryId }
-      })
-      if (!category) {
-        return NextResponse.json({ error: "Category not found" }, { status: 400 })
-      }
-    }
-    
-    const product = await prisma.product.update({
+    const { name, description, price, image, categoryId, quantity, discount } = body
+
+    const updatedProduct = await prisma.product.update({
       where: { id: params.id },
-      data: { 
-        name: name.trim(),
-        description: description?.trim() || null,
-        price,
-        image: image?.trim() || null,
-        categoryId: categoryId || null,
+      data: {
+        name: name || undefined,
+        description: description || undefined,
+        price: price ? parseFloat(price) : undefined,
+        image: image || undefined,
+        categoryId: categoryId || undefined,
+        quantity: quantity ? parseInt(quantity) : undefined,
+        discount: discount ? parseFloat(discount) : undefined,
       },
-      include: { category: true }
+      include: {
+        category: true,
+      },
     })
-    return NextResponse.json(product)
+
+    return NextResponse.json(updatedProduct)
   } catch (error) {
-    console.error("Product update error:", error)
-    return NextResponse.json({ error: "Failed to update product" }, { status: 500 })
+    console.error("Product PUT error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions)
+  const session = await auth()
   if (!session || session.user?.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }

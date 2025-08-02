@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -22,13 +22,18 @@ import {
   Shield,
   Bell,
   LogOut,
+  Calendar,
+  DollarSign,
+  ArrowRight,
+  Check,
+  X,
+  AlertTriangle,
 } from "lucide-react"
 import Image from "next/image"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
 import { signOut } from "next-auth/react"
 import useSWR from "swr"
 import { useToast } from "@/hooks/use-toast"
@@ -36,6 +41,14 @@ import { PasswordChangeModal } from "@/components/password-change-modal"
 import { DeleteAccountModal } from "@/components/delete-account-modal"
 import { mutate } from "swr"
 import { useAuth } from "@/contexts/auth-context"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
@@ -56,8 +69,8 @@ export default function AccountPage() {
 
   // Settings state
   const [formData, setFormData] = useState({
-    firstName: "Isabella",
-    lastName: "Rodriguez",
+    firstName: "",
+    lastName: "",
     email: "",
     phone: "",
     address: ""
@@ -69,6 +82,7 @@ export default function AccountPage() {
   })
   const [isSaving, setIsSaving] = useState(false)
   const [isUpdatingSubscription, setIsUpdatingSubscription] = useState(false)
+  const [showCancelDialog, setShowCancelDialog] = useState(false)
 
   // Modal states
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false)
@@ -96,8 +110,8 @@ export default function AccountPage() {
       const [firstName, ...lastNameParts] = (profile.name || "").split(" ")
       const lastName = lastNameParts.join(" ")
       setFormData({
-        firstName: firstName || "Isabella",
-        lastName: lastName || "Rodriguez",
+        firstName: firstName || "",
+        lastName: lastName || "",
         email: profile.email || "",
         phone: profile.phone || "",
         address: profile.address || ""
@@ -117,7 +131,7 @@ export default function AccountPage() {
   const handleSaveChanges = async () => {
     setIsSaving(true)
     try {
-      const response = await fetch("/api/account/settings", {
+      const response = await fetch("/api/account", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -206,12 +220,14 @@ export default function AccountPage() {
     }
   }
 
-  const handleCancelSubscription = async () => {
-    if (!window.confirm("Are you sure you want to cancel your subscription? You'll lose access to premium benefits.")) {
-      return
-    }
+  const handleCancelSubscription = () => {
+    setShowCancelDialog(true)
+  }
 
+  const confirmCancelSubscription = async () => {
     setIsUpdatingSubscription(true)
+    setShowCancelDialog(false)
+    
     try {
       const response = await fetch("/api/subscription", {
         method: "DELETE"
@@ -948,6 +964,78 @@ export default function AccountPage() {
       <Footer />
       <PasswordChangeModal isOpen={isPasswordModalOpen} onClose={() => setIsPasswordModalOpen(false)} />
       <DeleteAccountModal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} />
+      <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                <AlertTriangle className="h-5 w-5 text-red-600" />
+              </div>
+              <DialogTitle className="text-xl">Cancel Subscription</DialogTitle>
+            </div>
+            <DialogDescription className="text-base">
+              Are you sure you want to cancel your <span className="font-semibold">{profile?.currentTier}</span> subscription?
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <h4 className="font-medium text-red-800 mb-2">What happens when you cancel:</h4>
+              <ul className="text-sm text-red-700 space-y-1">
+                <li className="flex items-center gap-2">
+                  <X className="h-4 w-4" />
+                  You'll lose access to {profile?.currentTier === "Ultra-Exclusive" ? "25%" : "15%"} member discounts
+                </li>
+                <li className="flex items-center gap-2">
+                  <X className="h-4 w-4" />
+                  Your tier will be reset to Iconic Collection (Free)
+                </li>
+                <li className="flex items-center gap-2">
+                  <X className="h-4 w-4" />
+                  You'll lose priority customer service
+                </li>
+                {profile?.currentTier === "Ultra-Exclusive" && (
+                  <>
+                    <li className="flex items-center gap-2">
+                      <X className="h-4 w-4" />
+                      You'll lose personal concierge service
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <X className="h-4 w-4" />
+                      You'll lose complimentary worldwide shipping
+                    </li>
+                  </>
+                )}
+              </ul>
+            </div>
+            
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <h4 className="font-medium text-yellow-800 mb-2">You can always reactivate:</h4>
+              <p className="text-sm text-yellow-700">
+                You can upgrade your subscription again at any time from your account settings.
+              </p>
+            </div>
+          </div>
+          
+          <DialogFooter className="gap-3">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowCancelDialog(false)}
+              className="flex-1"
+            >
+              Keep Subscription
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={confirmCancelSubscription}
+              disabled={isUpdatingSubscription}
+              className="flex-1"
+            >
+              {isUpdatingSubscription ? "Cancelling..." : "Cancel Subscription"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

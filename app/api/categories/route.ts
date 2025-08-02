@@ -1,21 +1,28 @@
 import { NextResponse } from "next/server"
 import { PrismaClient } from "@/lib/generated/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "../auth/[...nextauth]/route"
+import { auth } from "@/lib/auth"
 
 const prisma = new PrismaClient()
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const categories = await prisma.category.findMany({ orderBy: { name: "asc" } })
+    const session = await auth()
+    
+    const categories = await prisma.category.findMany({
+      include: {
+        products: true,
+      },
+    })
+
     return NextResponse.json(categories)
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch categories" }, { status: 500 })
+    console.error("Categories GET error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions)
+  const session = await auth()
   if (!session || session.user?.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }

@@ -1,87 +1,84 @@
 import { NextResponse } from "next/server"
 import { PrismaClient } from "@/lib/generated/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "../../auth/[...nextauth]/route"
+import { auth } from "@/lib/auth"
 
 const prisma = new PrismaClient()
 
-async function isAdmin(session: any) {
-  return session && session.user?.role === "admin"
-}
-
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions)
-  if (!await isAdmin(session)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
   try {
-    const { action, ids, data } = await req.json()
+    const session = await auth()
     
+    if (!session?.user?.role || session.user.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const body = await req.json()
+    const { action, ids, data } = body
+
     if (!action || !ids || !Array.isArray(ids)) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+      return NextResponse.json({ error: "Action and IDs array are required" }, { status: 400 })
     }
 
     switch (action) {
       case "deleteUsers":
         await prisma.user.deleteMany({
-          where: { id: { in: ids } }
+          where: { id: { in: ids } },
         })
-        break
+        return NextResponse.json({ message: `${ids.length} users deleted` })
 
       case "updateUserRoles":
         if (!data?.role) {
-          return NextResponse.json({ error: "Missing role" }, { status: 400 })
+          return NextResponse.json({ error: "Role is required for user role update" }, { status: 400 })
         }
         await prisma.user.updateMany({
           where: { id: { in: ids } },
-          data: { role: data.role }
+          data: { role: data.role },
         })
-        break
+        return NextResponse.json({ message: `${ids.length} user roles updated` })
 
       case "deleteProducts":
         await prisma.product.deleteMany({
-          where: { id: { in: ids } }
+          where: { id: { in: ids } },
         })
-        break
+        return NextResponse.json({ message: `${ids.length} products deleted` })
 
       case "deleteOrders":
         await prisma.order.deleteMany({
-          where: { id: { in: ids } }
+          where: { id: { in: ids } },
         })
-        break
+        return NextResponse.json({ message: `${ids.length} orders deleted` })
 
       case "updateOrderStatus":
         if (!data?.status) {
-          return NextResponse.json({ error: "Missing status" }, { status: 400 })
+          return NextResponse.json({ error: "Status is required for order status update" }, { status: 400 })
         }
         await prisma.order.updateMany({
           where: { id: { in: ids } },
-          data: { status: data.status }
+          data: { status: data.status },
         })
-        break
+        return NextResponse.json({ message: `${ids.length} order statuses updated` })
 
       case "deleteCategories":
         await prisma.category.deleteMany({
-          where: { id: { in: ids } }
+          where: { id: { in: ids } },
         })
-        break
+        return NextResponse.json({ message: `${ids.length} categories deleted` })
 
       case "renameCategories":
         if (!data?.name) {
-          return NextResponse.json({ error: "Missing name" }, { status: 400 })
+          return NextResponse.json({ error: "Name is required for category rename" }, { status: 400 })
         }
         await prisma.category.updateMany({
           where: { id: { in: ids } },
-          data: { name: data.name }
+          data: { name: data.name },
         })
-        break
+        return NextResponse.json({ message: `${ids.length} categories renamed` })
 
       default:
         return NextResponse.json({ error: "Invalid action" }, { status: 400 })
     }
-
-    return NextResponse.json({ message: "Bulk operation completed successfully" })
   } catch (error) {
-    return NextResponse.json({ error: "Failed to perform bulk operation" }, { status: 500 })
+    console.error("Admin bulk operations error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 } 

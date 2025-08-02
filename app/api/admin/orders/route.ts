@@ -1,50 +1,79 @@
 import { NextResponse } from "next/server"
 import { PrismaClient } from "@/lib/generated/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "../../auth/[...nextauth]/route"
+import { auth } from "@/lib/auth"
 
 const prisma = new PrismaClient()
 
-async function isAdmin(session: any) {
-  return session && session.user?.role === "admin"
-}
-
-export async function GET() {
-  const session = await getServerSession(authOptions)
-  if (!await isAdmin(session)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+export async function GET(req: Request) {
   try {
+    const session = await auth()
+    
+    if (!session?.user?.role || session.user.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
     const orders = await prisma.order.findMany({
       include: {
-        user: { select: { id: true, name: true, email: true } },
-        items: { include: { product: true } },
+        items: {
+          include: {
+            product: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
     })
+
     return NextResponse.json(orders)
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 })
+    console.error("Admin orders GET error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
-export async function PATCH(req: Request) {
-  const session = await getServerSession(authOptions)
-  if (!await isAdmin(session)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+export async function PUT(req: Request) {
   try {
-    const { orderId, status } = await req.json()
-    if (!orderId || !status) {
-      return NextResponse.json({ error: "Missing orderId or status" }, { status: 400 })
+    const session = await auth()
+    
+    if (!session?.user?.role || session.user.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
-    const order = await prisma.order.update({
+
+    const body = await req.json()
+    const { orderId, status } = body
+
+    if (!orderId || !status) {
+      return NextResponse.json({ error: "Order ID and status are required" }, { status: 400 })
+    }
+
+    const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: { status },
-      include: { user: true, items: true },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
     })
-    return NextResponse.json(order)
+
+    return NextResponse.json(updatedOrder)
   } catch (error) {
-    return NextResponse.json({ error: "Failed to update order status" }, { status: 500 })
+    console.error("Admin orders PUT error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 } 

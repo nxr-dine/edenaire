@@ -6,25 +6,33 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { Minus, Plus, X, Heart, Shield, Truck, RotateCcw, Gift, Tag, ShoppingBag } from "lucide-react"
+import { Minus, Plus, X, Heart, Shield, Truck, RotateCcw, Gift, Tag, ShoppingBag, Crown, Diamond, Star } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
+import { useAuth } from "@/contexts/auth-context"
+import { getSubscriptionBenefits, getTierDisplayName, getTierBadgeColor } from "@/lib/subscription-utils"
 import useSWR from "swr"
 
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
 export default function CartPage() {
   const [promoCode, setPromoCode] = useState("")
+  const { user } = useAuth()
   const { data: cart, isLoading, mutate } = useSWR("/api/cart", fetcher)
-  const cartItems = cart?.items?.map((item: any) => ({
-    ...item.product,
-    quantity: item.quantity,
-    id: item.productId,
-    inStock: true, // Optionally, use a real stock property if available
-    estimatedDelivery: "3-5 business days", // Optionally, use a real property if available
-  })) || []
+  
+  const userTier = user?.tier || "iconic"
+  const benefits = getSubscriptionBenefits(userTier)
+  
+  const cartItems = (cart?.items || []).map((item: any) => ({
+    ...item,
+    price: item.price || 0,
+    discountedPrice: item.discountedPrice || item.price || 0,
+    quantity: item.quantity || 1,
+    inStock: true,
+    estimatedDelivery: benefits.shippingType === "Complimentary Worldwide" ? "1-2 business days" : "3-5 business days",
+  }))
 
   const updateQuantity = async (id: string, newQuantity: number) => {
     if (newQuantity === 0) {
@@ -53,16 +61,21 @@ export default function CartPage() {
     await removeItem(id)
   }
 
-  const subtotal = cartItems.reduce((sum: number, item: any) => sum + item.price * item.quantity, 0)
+  const subtotal = cart?.total || 0
+  const discountedTotal = cart?.discountedTotal || subtotal
+  const discountAmount = cart?.discountAmount || 0
+  const discountPercentage = cart?.discountPercentage || 0
+  
   const savings = cartItems.reduce((sum: number, item: any) => {
     if (item.originalPrice) {
       return sum + (item.originalPrice - item.price) * item.quantity
     }
     return sum
-  }, 0)
+  }, 0) + discountAmount
+  
   const shipping = 0 // Free shipping
-  const tax = subtotal * 0.08 // 8% tax
-  const total = subtotal + shipping + tax
+  const tax = discountedTotal * 0.08 // 8% tax
+  const total = discountedTotal + shipping + tax
 
   const getTierColor = (tier: string) => {
     switch (tier) {
@@ -77,6 +90,19 @@ export default function CartPage() {
     }
   }
 
+  const getTierIcon = (tier: string) => {
+    switch (tier) {
+      case "Ultra-Exclusive":
+        return Crown
+      case "Prestige Collection":
+        return Diamond
+      default:
+        return Star
+    }
+  }
+
+  const TierIcon = getTierIcon(userTier)
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -89,6 +115,19 @@ export default function CartPage() {
             {cartItems.length} {cartItems.length === 1 ? "item" : "items"} in your cart
           </p>
         </div>
+
+        {/* Subscription Benefits Banner */}
+        {benefits.discountPercentage > 0 && (
+          <div className={`mb-6 p-4 rounded-lg ${getTierBadgeColor(userTier)} text-center`}>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <TierIcon className="h-5 w-5" />
+              <span className="font-medium">{getTierDisplayName(userTier)} Member</span>
+            </div>
+            <p className="text-sm">
+              Enjoy {benefits.discountPercentage}% off all products + {benefits.shippingType} shipping
+            </p>
+          </div>
+        )}
 
         {isLoading ? (
           <div className="text-center py-16 text-gray-500">Loading cart...</div>
@@ -120,11 +159,18 @@ export default function CartPage() {
                               <span className="text-sm text-gray-600">Delivery: {item.estimatedDelivery}</span>
                             </div>
                             <div className="flex items-center space-x-2">
-                              <span className="text-2xl font-light text-gray-900">${item.price.toLocaleString()}</span>
-                              {item.originalPrice && (
-                                <span className="text-lg text-gray-500 line-through">
-                                  ${item.originalPrice.toLocaleString()}
-                                </span>
+                              {benefits.discountPercentage > 0 ? (
+                                <>
+                                  <span className="text-2xl font-light text-gray-900">${(item.discountedPrice || item.price || 0).toLocaleString()}</span>
+                                  <span className="text-lg text-gray-500 line-through">
+                                    ${(item.price || 0).toLocaleString()}
+                                  </span>
+                                  <Badge className={`text-xs ${getTierBadgeColor(userTier)}`}>
+                                    {benefits.discountPercentage}% OFF
+                                  </Badge>
+                                </>
+                              ) : (
+                                <span className="text-2xl font-light text-gray-900">${(item.price || 0).toLocaleString()}</span>
                               )}
                             </div>
                           </div>
@@ -216,15 +262,21 @@ export default function CartPage() {
                       <span className="text-gray-700">Subtotal</span>
                       <span className="font-medium">${subtotal.toLocaleString()}</span>
                     </div>
-                    {savings > 0 && (
+                    {discountPercentage > 0 && (
                       <div className="flex justify-between text-lg">
-                        <span className="text-gray-700">Savings</span>
-                        <span className="font-medium text-green-600">-${savings.toLocaleString()}</span>
+                        <span className="text-gray-700">Member Discount ({discountPercentage}%)</span>
+                        <span className="font-medium text-green-600">-${discountAmount.toLocaleString()}</span>
+                      </div>
+                    )}
+                    {savings > discountAmount && (
+                      <div className="flex justify-between text-lg">
+                        <span className="text-gray-700">Additional Savings</span>
+                        <span className="font-medium text-green-600">-${(savings - discountAmount).toLocaleString()}</span>
                       </div>
                     )}
                     <div className="flex justify-between text-lg">
                       <span className="text-gray-700">Shipping</span>
-                      <span className="font-medium text-green-600">Complimentary</span>
+                      <span className="font-medium text-green-600">{benefits.shippingType}</span>
                     </div>
                     <div className="flex justify-between text-lg">
                       <span className="text-gray-700">Tax</span>

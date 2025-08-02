@@ -36,7 +36,7 @@ const tiers = [
   {
     name: "Prestige Collection",
     subtitle: "Elevated Experience",
-    price: "$99/month",
+    price: "$199/month",
     description: "Premium access with exclusive benefits and priority service",
     features: [
       "Everything in Iconic Collection",
@@ -44,14 +44,14 @@ const tiers = [
       "Priority customer support",
       "Early access to new collections",
       "Complimentary jewelry cleaning",
-      "Exclusive member benefits",
+      "Express shipping",
     ],
     color: "from-yellow-400 to-yellow-600",
     bgColor: "bg-yellow-50",
     textColor: "text-yellow-900",
     buttonColor: "bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700",
     popular: true,
-    tier: "prestige",
+    tier: "Prestige Collection",
   },
   {
     name: "Ultra-Exclusive",
@@ -72,7 +72,7 @@ const tiers = [
     bgColor: "bg-purple-50",
     textColor: "text-purple-900",
     buttonColor: "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700",
-    tier: "ultra-exclusive",
+    tier: "Ultra-Exclusive",
   },
 ]
 

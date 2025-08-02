@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server"
 import { PrismaClient } from "@/lib/generated/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "../auth/[...nextauth]/route"
+import { auth } from "@/lib/auth"
 
 const prisma = new PrismaClient()
 
 export async function GET(req: Request) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -80,21 +79,26 @@ export async function GET(req: Request) {
 
 export async function PUT(req: Request) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const body = await req.json()
-    const { name, phone, tier } = body
+    const { personalInfo } = body
+
+    // Extract name from firstName and lastName
+    const fullName = personalInfo.firstName && personalInfo.lastName 
+      ? `${personalInfo.firstName} ${personalInfo.lastName}`.trim()
+      : personalInfo.firstName || personalInfo.lastName || undefined
 
     const updatedUser = await prisma.user.update({
       where: { email: session.user.email },
       data: {
-        name: name || undefined,
-        phone: phone || undefined,
-        tier: tier || undefined,
+        name: fullName,
+        phone: personalInfo.phone || undefined,
+        address: personalInfo.address || undefined,
       },
       select: {
         id: true,
@@ -109,7 +113,46 @@ export async function PUT(req: Request) {
       },
     })
 
-    return NextResponse.json(updatedUser)
+    // Transform the response to match frontend expectations
+    const getNextTier = (currentTier: string) => {
+      switch (currentTier) {
+        case 'iconic':
+          return 'Prestige Collection'
+        case 'Prestige Collection':
+          return 'Ultra-Exclusive'
+        case 'Ultra-Exclusive':
+          return 'Ultra-Exclusive'
+        default:
+          return 'Prestige Collection'
+      }
+    }
+
+    const getTierColor = (tier: string) => {
+      switch (tier) {
+        case 'Ultra-Exclusive':
+          return 'purple'
+        case 'Prestige Collection':
+          return 'blue'
+        case 'iconic':
+        default:
+          return 'yellow'
+      }
+    }
+
+    const profileData = {
+      ...updatedUser,
+      memberSince: updatedUser.createdAt ? new Date(updatedUser.createdAt).toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long' 
+      }) : 'Unknown',
+      totalSpent: '$0',
+      currentTier: updatedUser.tier || 'iconic',
+      nextTier: getNextTier(updatedUser.tier || 'iconic'),
+      tierProgress: 0,
+      tierColor: getTierColor(updatedUser.tier || 'iconic')
+    }
+
+    return NextResponse.json(profileData)
   } catch (error) {
     console.error("Account update error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

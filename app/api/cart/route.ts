@@ -1,13 +1,24 @@
 import { NextResponse } from "next/server"
 import { PrismaClient } from "@/lib/generated/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "../auth/[...nextauth]/route"
+import { auth } from "@/lib/auth"
 
 const prisma = new PrismaClient()
 
+// Helper function to calculate discount percentage based on tier
+const getDiscountPercentage = (tier: string): number => {
+  switch (tier) {
+    case "Ultra-Exclusive":
+      return 25
+    case "Prestige Collection":
+      return 15
+    default:
+      return 0
+  }
+}
+
 export async function GET(req: Request) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -15,7 +26,7 @@ export async function GET(req: Request) {
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      select: { id: true },
+      select: { id: true, tier: true },
     })
 
     if (!user) {
@@ -34,10 +45,19 @@ export async function GET(req: Request) {
     })
 
     if (!cart) {
-      return NextResponse.json({ items: [], total: 0 })
+      return NextResponse.json({ 
+        items: [], 
+        total: 0, 
+        discountedTotal: 0,
+        discountPercentage: 0,
+        userTier: user.tier 
+      })
     }
 
-    const total = cart.items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0)
+    const discountPercentage = getDiscountPercentage(user.tier)
+    const subtotal = cart.items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0)
+    const discountAmount = (subtotal * discountPercentage) / 100
+    const discountedTotal = Math.round(subtotal - discountAmount)
 
     return NextResponse.json({
       items: cart.items.map(item => ({
@@ -45,10 +65,15 @@ export async function GET(req: Request) {
         productId: item.productId,
         name: item.product.name,
         price: item.product.price,
+        discountedPrice: discountPercentage > 0 ? Math.round(item.product.price * (1 - discountPercentage / 100)) : item.product.price,
         quantity: item.quantity,
         image: item.product.image,
       })),
-      total,
+      total: subtotal,
+      discountedTotal,
+      discountPercentage,
+      discountAmount: Math.round(discountAmount),
+      userTier: user.tier,
     })
   } catch (error) {
     console.error("Cart GET error:", error)
@@ -58,7 +83,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

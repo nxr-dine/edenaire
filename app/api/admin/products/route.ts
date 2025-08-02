@@ -1,106 +1,128 @@
 import { NextResponse } from "next/server"
 import { PrismaClient } from "@/lib/generated/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "../../auth/[...nextauth]/route"
+import { auth } from "@/lib/auth"
 
 const prisma = new PrismaClient()
 
-async function isAdmin(session: any) {
-  return session && session.user?.role === "admin"
-}
-
-export async function GET() {
-  const session = await getServerSession(authOptions)
-  if (!await isAdmin(session)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+export async function GET(req: Request) {
   try {
+    const session = await auth()
+    
+    if (!session?.user?.role || session.user.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
     const products = await prisma.product.findMany({
       include: {
         category: true,
       },
       orderBy: { createdAt: "desc" },
     })
+
     return NextResponse.json(products)
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 })
+    console.error("Admin products GET error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions)
-  if (!await isAdmin(session)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
   try {
-    const { name, description, price, quantity, discount, image, categoryId } = await req.json()
-    if (!name || !description || !price || !quantity || !categoryId) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    const session = await auth()
+    
+    if (!session?.user?.role || session.user.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
-    const product = await prisma.product.create({
+
+    const body = await req.json()
+    const { name, description, price, image, categoryId, quantity, discount } = body
+
+    if (!name || !price) {
+      return NextResponse.json({ error: "Name and price are required" }, { status: 400 })
+    }
+
+    const newProduct = await prisma.product.create({
       data: {
         name,
-        description,
+        description: description || "",
         price: parseFloat(price),
-        quantity: parseInt(quantity),
-        discount: parseFloat(discount || "0"),
-        image: image || "/placeholder.svg",
-        categoryId,
+        image: image || "",
+        categoryId: categoryId || null,
+        quantity: quantity ? parseInt(quantity) : 0,
+        discount: discount ? parseFloat(discount) : 0,
       },
       include: {
         category: true,
       },
     })
-    return NextResponse.json(product)
+
+    return NextResponse.json(newProduct)
   } catch (error) {
-    return NextResponse.json({ error: "Failed to create product" }, { status: 500 })
+    console.error("Admin products POST error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
-export async function PATCH(req: Request) {
-  const session = await getServerSession(authOptions)
-  if (!await isAdmin(session)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+export async function PUT(req: Request) {
   try {
-    const { id, name, description, price, quantity, discount, image, categoryId } = await req.json()
-    if (!id) {
-      return NextResponse.json({ error: "Missing product ID" }, { status: 400 })
+    const session = await auth()
+    
+    if (!session?.user?.role || session.user.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
-    const product = await prisma.product.update({
-      where: { id },
+
+    const body = await req.json()
+    const { productId, name, description, price, image, categoryId, quantity, discount } = body
+
+    if (!productId) {
+      return NextResponse.json({ error: "Product ID is required" }, { status: 400 })
+    }
+
+    const updatedProduct = await prisma.product.update({
+      where: { id: productId },
       data: {
-        ...(name && { name }),
-        ...(description && { description }),
-        ...(price && { price: parseFloat(price) }),
-        ...(quantity && { quantity: parseInt(quantity) }),
-        ...(discount !== undefined && { discount: parseFloat(discount) }),
-        ...(image && { image }),
-        ...(categoryId && { categoryId }),
+        name: name || undefined,
+        description: description || undefined,
+        price: price ? parseFloat(price) : undefined,
+        image: image || undefined,
+        categoryId: categoryId || undefined,
+        quantity: quantity ? parseInt(quantity) : undefined,
+        discount: discount ? parseFloat(discount) : undefined,
       },
       include: {
         category: true,
       },
     })
-    return NextResponse.json(product)
+
+    return NextResponse.json(updatedProduct)
   } catch (error) {
-    return NextResponse.json({ error: "Failed to update product" }, { status: 500 })
+    console.error("Admin products PUT error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
 export async function DELETE(req: Request) {
-  const session = await getServerSession(authOptions)
-  if (!await isAdmin(session)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
   try {
-    const { id } = await req.json()
-    if (!id) {
-      return NextResponse.json({ error: "Missing product ID" }, { status: 400 })
+    const session = await auth()
+    
+    if (!session?.user?.role || session.user.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
-    await prisma.product.delete({ where: { id } })
-    return NextResponse.json({ message: "Product deleted" })
+
+    const body = await req.json()
+    const { productId } = body
+
+    if (!productId) {
+      return NextResponse.json({ error: "Product ID is required" }, { status: 400 })
+    }
+
+    await prisma.product.delete({
+      where: { id: productId },
+    })
+
+    return NextResponse.json({ message: "Product deleted successfully" })
   } catch (error) {
-    return NextResponse.json({ error: "Failed to delete product" }, { status: 500 })
+    console.error("Admin products DELETE error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 } 

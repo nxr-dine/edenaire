@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server"
 import { PrismaClient } from "@/lib/generated/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "../../auth/[...nextauth]/route"
+import { auth } from "@/lib/auth"
 
 const prisma = new PrismaClient()
 
 export async function PUT(req: Request) {
-  const session = await getServerSession(authOptions)
+  const session = await auth()
   if (!session || !session.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
@@ -61,7 +60,7 @@ export async function PUT(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const session = await getServerSession(authOptions)
+  const session = await auth()
   if (!session || !session.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }

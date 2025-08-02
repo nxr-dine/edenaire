@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server"
 import { PrismaClient } from "@/lib/generated/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "../auth/[...nextauth]/route"
+import { auth } from "@/lib/auth"
 
 const prisma = new PrismaClient()
 
 export async function GET(req: Request) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -46,7 +45,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -55,10 +54,20 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { tier } = body
 
+    if (!tier) {
+      return NextResponse.json({ error: "Tier is required" }, { status: 400 })
+    }
+
+    // Validate tier
+    const validTiers = ["iconic", "Prestige Collection", "Ultra-Exclusive"]
+    if (!validTiers.includes(tier)) {
+      return NextResponse.json({ error: "Invalid tier" }, { status: 400 })
+    }
+
     // Update user tier
     const updatedUser = await prisma.user.update({
       where: { email: session.user.email },
-      data: { tier: tier || "Ultra-Exclusive" },
+      data: { tier: tier },
       select: {
         id: true,
         tier: true,
@@ -69,13 +78,15 @@ export async function POST(req: Request) {
     const subscription = await prisma.subscription.upsert({
       where: { userId: updatedUser.id },
       update: {
-        plan: tier || "Ultra-Exclusive",
+        plan: tier,
         active: true,
+        startedAt: new Date(),
       },
       create: {
         userId: updatedUser.id,
-        plan: tier || "Ultra-Exclusive",
+        plan: tier,
         active: true,
+        startedAt: new Date(),
       },
     })
 
@@ -96,7 +107,7 @@ export async function POST(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

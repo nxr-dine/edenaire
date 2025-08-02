@@ -40,14 +40,17 @@ export default function CheckoutPage() {
   const router = useRouter()
 
   const { data: cart, isLoading } = useSWR("/api/cart", fetcher)
-  const cartItems = cart?.items?.map((item: any) => ({
-    ...item.product,
-    quantity: item.quantity,
-    id: item.productId,
-    tier: item.product?.tier || "",
-  })) || []
+  const cartItems = (cart?.items || []).map((item: any) => ({
+    ...item,
+    quantity: item.quantity || 1,
+    id: item.productId || item.id,
+    tier: item.tier || "",
+    price: item.price || 0,
+    name: item.name || "Unknown Product",
+    image: item.image || "/placeholder.svg",
+  }))
 
-  const subtotal = cartItems.reduce((sum: number, item: any) => sum + item.price * item.quantity, 0)
+  const subtotal = cartItems.reduce((sum: number, item: any) => sum + (item.price || 0) * (item.quantity || 1), 0)
   const shipping = 0 // Free shipping
   const tax = subtotal * 0.08 // 8% tax
   const total = subtotal + shipping + tax
@@ -532,7 +535,7 @@ export default function CheckoutPage() {
                         <span className="text-sm text-gray-600">Qty: {item.quantity}</span>
                       </div>
                     </div>
-                    <span className="font-medium text-lg text-gray-900">${item.price.toLocaleString()}</span>
+                    <span className="font-medium text-lg text-gray-900">${(item.price || 0).toLocaleString()}</span>
                   </div>
                 ))}
 

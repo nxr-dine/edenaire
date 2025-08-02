@@ -1,96 +1,112 @@
 import { NextResponse } from "next/server"
 import { PrismaClient } from "@/lib/generated/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "../../auth/[...nextauth]/route"
+import { auth } from "@/lib/auth"
 
 const prisma = new PrismaClient()
 
-async function isAdmin(session: any) {
-  return session && session.user?.role === "admin"
-}
-
-export async function GET() {
-  const session = await getServerSession(authOptions)
-  if (!await isAdmin(session)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+export async function GET(req: Request) {
   try {
+    const session = await auth()
+    
+    if (!session?.user?.role || session.user.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
     const categories = await prisma.category.findMany({
       include: {
-        _count: {
-          select: { products: true }
-        }
+        products: true,
       },
       orderBy: { name: "asc" },
     })
+
     return NextResponse.json(categories)
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch categories" }, { status: 500 })
+    console.error("Admin categories GET error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions)
-  if (!await isAdmin(session)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
   try {
-    const { name } = await req.json()
-    if (!name) {
-      return NextResponse.json({ error: "Missing category name" }, { status: 400 })
+    const session = await auth()
+    
+    if (!session?.user?.role || session.user.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
-    const category = await prisma.category.create({
+
+    const body = await req.json()
+    const { name } = body
+
+    if (!name) {
+      return NextResponse.json({ error: "Name is required" }, { status: 400 })
+    }
+
+    const newCategory = await prisma.category.create({
       data: { name },
       include: {
-        _count: {
-          select: { products: true }
-        }
+        products: true,
       },
     })
-    return NextResponse.json(category)
+
+    return NextResponse.json(newCategory)
   } catch (error) {
-    return NextResponse.json({ error: "Failed to create category" }, { status: 500 })
+    console.error("Admin categories POST error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
-export async function PATCH(req: Request) {
-  const session = await getServerSession(authOptions)
-  if (!await isAdmin(session)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+export async function PUT(req: Request) {
   try {
-    const { id, name } = await req.json()
-    if (!id || !name) {
-      return NextResponse.json({ error: "Missing category ID or name" }, { status: 400 })
+    const session = await auth()
+    
+    if (!session?.user?.role || session.user.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
-    const category = await prisma.category.update({
-      where: { id },
+
+    const body = await req.json()
+    const { categoryId, name } = body
+
+    if (!categoryId || !name) {
+      return NextResponse.json({ error: "Category ID and name are required" }, { status: 400 })
+    }
+
+    const updatedCategory = await prisma.category.update({
+      where: { id: categoryId },
       data: { name },
       include: {
-        _count: {
-          select: { products: true }
-        }
+        products: true,
       },
     })
-    return NextResponse.json(category)
+
+    return NextResponse.json(updatedCategory)
   } catch (error) {
-    return NextResponse.json({ error: "Failed to update category" }, { status: 500 })
+    console.error("Admin categories PUT error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
 export async function DELETE(req: Request) {
-  const session = await getServerSession(authOptions)
-  if (!await isAdmin(session)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
   try {
-    const { id } = await req.json()
-    if (!id) {
-      return NextResponse.json({ error: "Missing category ID" }, { status: 400 })
+    const session = await auth()
+    
+    if (!session?.user?.role || session.user.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
-    await prisma.category.delete({ where: { id } })
-    return NextResponse.json({ message: "Category deleted" })
+
+    const body = await req.json()
+    const { categoryId } = body
+
+    if (!categoryId) {
+      return NextResponse.json({ error: "Category ID is required" }, { status: 400 })
+    }
+
+    await prisma.category.delete({
+      where: { id: categoryId },
+    })
+
+    return NextResponse.json({ message: "Category deleted successfully" })
   } catch (error) {
-    return NextResponse.json({ error: "Failed to delete category" }, { status: 500 })
+    console.error("Admin categories DELETE error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 } 

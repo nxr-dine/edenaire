@@ -1353,32 +1353,32 @@ export default function AdminDashboard() {
                         <td className="py-4 px-4"><input type="checkbox" checked={selectedProductIds.includes(product.id)} onChange={() => toggleProductSelection(product.id)} /></td>
                         <td className="py-4 px-4 font-medium text-gray-900">
                           {editingProduct && editingProduct.id === product.id ? (
-                            <input type="text" value={editingProduct ? (editingProduct.name || "") : ""} onChange={e => setEditingProduct({ ...editingProduct, name: e.target.value })} className="border rounded px-2 py-1" />
+                            <input type="text" value={editingProduct.name || ""} onChange={e => setEditingProduct({ ...editingProduct, name: e.target.value })} className="border rounded px-2 py-1" />
                           ) : product.name}
                         </td>
                         <td className="py-4 px-4 text-gray-700">
                           {editingProduct && editingProduct.id === product.id ? (
-                            <input type="text" value={editingProduct ? (editingProduct.description || "") : ""} onChange={e => setEditingProduct({ ...editingProduct, description: e.target.value })} className="border rounded px-2 py-1" />
+                            <input type="text" value={editingProduct.description || ""} onChange={e => setEditingProduct({ ...editingProduct, description: e.target.value })} className="border rounded px-2 py-1" />
                           ) : product.description}
                         </td>
                         <td className="py-4 px-4 text-gray-700">
                           {editingProduct && editingProduct.id === product.id ? (
-                            <input type="number" value={editingProduct ? (editingProduct.price || "") : ""} onChange={e => setEditingProduct({ ...editingProduct, price: parseFloat(e.target.value) })} className="border rounded px-2 py-1" />
+                            <input type="number" value={editingProduct.price || ""} onChange={e => setEditingProduct({ ...editingProduct, price: parseFloat(e.target.value) })} className="border rounded px-2 py-1" />
                           ) : product.price}
                         </td>
                         <td className="py-4 px-4 text-gray-700">
                           {editingProduct && editingProduct.id === product.id ? (
-                            <input type="number" value={editingProduct ? (editingProduct.quantity || "") : ""} onChange={e => setEditingProduct({ ...editingProduct, quantity: parseInt(e.target.value) || 0 })} className="border rounded px-2 py-1" />
+                            <input type="number" value={editingProduct.quantity || ""} onChange={e => setEditingProduct({ ...editingProduct, quantity: parseInt(e.target.value) || 0 })} className="border rounded px-2 py-1" />
                           ) : (product.quantity || 0)}
                         </td>
                         <td className="py-4 px-4 text-gray-700">
                           {editingProduct && editingProduct.id === product.id ? (
-                            <input type="number" value={editingProduct ? (editingProduct.discount || "") : ""} onChange={e => setEditingProduct({ ...editingProduct, discount: parseFloat(e.target.value) || 0 })} className="border rounded px-2 py-1" min="0" max="100" step="0.1" />
+                            <input type="number" value={editingProduct.discount || ""} onChange={e => setEditingProduct({ ...editingProduct, discount: parseFloat(e.target.value) || 0 })} className="border rounded px-2 py-1" min="0" max="100" step="0.1" />
                           ) : (product.discount || 0)}
                         </td>
                         <td className="py-4 px-4 text-gray-700">
                           {editingProduct && editingProduct.id === product.id ? (
-                            <input type="text" value={editingProduct ? (editingProduct.categoryId || "") : ""} onChange={e => setEditingProduct({ ...editingProduct, categoryId: e.target.value })} className="border rounded px-2 py-1" />
+                            <input type="text" value={editingProduct.categoryId || ""} onChange={e => setEditingProduct({ ...editingProduct, categoryId: e.target.value })} className="border rounded px-2 py-1" />
                           ) : (product.category?.name || product.categoryId || "")}
                         </td>
                         <td className="py-4 px-4">
@@ -1575,7 +1575,7 @@ export default function AdminDashboard() {
                         <td className="py-4 px-4"><input type="checkbox" checked={selectedCategoryIds.includes(category.id)} onChange={() => toggleCategorySelection(category.id)} /></td>
                         <td className="py-4 px-4 font-medium text-gray-900">
                           {editingCategory && editingCategory.id === category.id ? (
-                            <input type="text" value={editingCategory ? (editingCategory.name || "") : ""} onChange={e => setEditingCategory({ ...editingCategory, name: e.target.value })} className="border rounded px-2 py-1" />
+                            <input type="text" value={editingCategory.name || ""} onChange={e => setEditingCategory({ ...editingCategory, name: e.target.value })} className="border rounded px-2 py-1" />
                           ) : category.name}
                         </td>
                         <td className="py-4 px-4">

@@ -74,8 +74,17 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error creating order:', error);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+      session: session?.user?.id,
+      body: body
+    });
     return NextResponse.json(
-      { error: 'Failed to create order' },
+      { 
+        error: 'Failed to create order',
+        details: process.env.NODE_ENV === 'development' ? error instanceof Error ? error.message : "Unknown error" : undefined
+      },
       { status: 500 }
     );
   }

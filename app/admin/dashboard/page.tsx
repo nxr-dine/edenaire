@@ -311,7 +311,7 @@ export default function AdminDashboard() {
   async function handleUpdateProduct() {
     try {
       const response = await fetch("/api/admin/products", {
-        method: "PATCH",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editingProduct),
       })
@@ -345,10 +345,20 @@ export default function AdminDashboard() {
         mutateProducts()
         toast({ title: "Success", description: "Product created successfully" })
       } else {
-        toast({ title: "Error", description: "Failed to create product", variant: "destructive" })
+        const errorData = await response.json().catch(() => ({}))
+        toast({ 
+          title: "Error", 
+          description: errorData.error || "Failed to create product", 
+          variant: "destructive" 
+        })
       }
     } catch (error) {
-      toast({ title: "Error", description: "Failed to create product", variant: "destructive" })
+      console.error("Product creation error:", error)
+      toast({ 
+        title: "Error", 
+        description: error instanceof Error ? error.message : "Failed to create product", 
+        variant: "destructive" 
+      })
     }
   }
 

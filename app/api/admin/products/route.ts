@@ -59,7 +59,15 @@ export async function POST(req: Request) {
     return NextResponse.json(newProduct)
   } catch (error) {
     console.error("Admin products POST error:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    console.error("Error details:", {
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+      body: body
+    })
+    return NextResponse.json({ 
+      error: "Internal server error", 
+      details: process.env.NODE_ENV === 'development' ? error instanceof Error ? error.message : "Unknown error" : undefined
+    }, { status: 500 })
   }
 }
 

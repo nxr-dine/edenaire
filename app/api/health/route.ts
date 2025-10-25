@@ -5,7 +5,7 @@ export async function GET() {
   try {
     // Test database connection
     await prisma.$queryRaw`SELECT 1`;
-    
+
     // Check environment variables
     const envCheck = {
       database: !!process.env.DATABASE_URL,

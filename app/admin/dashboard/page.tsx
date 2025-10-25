@@ -242,7 +242,7 @@ export default function AdminDashboard() {
   async function handleRoleChange(userId: string, role: string) {
     try {
       const response = await fetch("/api/admin/users", {
-        method: "PATCH",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, role }),
       })
@@ -365,7 +365,7 @@ export default function AdminDashboard() {
   async function handleUpdateOrderStatus(orderId: string, status: string) {
     try {
       const response = await fetch("/api/admin/orders", {
-        method: "PATCH",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderId, status }),
       })
@@ -458,7 +458,7 @@ export default function AdminDashboard() {
   async function confirmOrderStatusChange() {
     try {
       await fetch("/api/admin/orders", {
-        method: "PATCH",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderStatusChange),
       })
@@ -514,7 +514,7 @@ export default function AdminDashboard() {
   async function handleUpdateCategory() {
     try {
       const response = await fetch("/api/admin/categories", {
-        method: "PATCH",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editingCategory),
       })

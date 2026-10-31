@@ -9,12 +9,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Eye, EyeOff, Mail, Lock, ArrowRight, Loader2 } from "lucide-react"
+import { Eye, EyeOff, Mail, Lock, ArrowRight, Loader2, UserRound, ShieldCheck } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { signIn } from "next-auth/react"
 import type { CheckedState } from "@radix-ui/react-checkbox"
+import { useAuth } from "@/contexts/auth-context"
 
 function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
@@ -25,7 +26,13 @@ function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/account'
+  const callbackUrl = searchParams.get('callbackUrl')
+  const { loginAsDemo } = useAuth()
+
+  const handleDemoLogin = (role: "user" | "admin") => {
+    loginAsDemo(role)
+    router.push(callbackUrl || (role === "admin" ? "/admin/dashboard" : "/account"))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -40,7 +47,7 @@ function LoginForm() {
     if (res?.error) {
       setError("Invalid email or password")
     } else {
-      router.push(callbackUrl)
+      router.push(callbackUrl || "/account")
     }
   }
 
@@ -159,6 +166,28 @@ function LoginForm() {
               </Button>
             </form>
 
+            <div className="space-y-3 border-t border-gray-200 pt-5">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full h-12 border-gray-300"
+                onClick={() => handleDemoLogin("user")}
+              >
+                <UserRound className="mr-2 h-5 w-5" />
+                Continue as demo customer
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full h-12 border-gray-300"
+                onClick={() => handleDemoLogin("admin")}
+              >
+                <ShieldCheck className="mr-2 h-5 w-5" />
+                Continue as demo admin
+              </Button>
+              <p className="text-center text-xs text-gray-500">Local demo account · no database required</p>
+            </div>
+
             {/* Sign Up Link */}
             <div className="text-center pt-4 border-t border-gray-200">
               <p className="text-gray-600">
@@ -173,7 +202,7 @@ function LoginForm() {
 
         {/* Footer */}
         <div className="text-center mt-8 text-gray-400 text-sm">
-          <p>© 2024 Edenaire. All rights reserved.</p>
+          <p>© Edenaire. All rights reserved.</p>
           <div className="flex justify-center space-x-4 mt-2">
             <Link href="/privacy" className="hover:text-yellow-400 transition-colors">
               Privacy

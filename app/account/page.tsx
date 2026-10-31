@@ -32,7 +32,6 @@ import {
 import Image from "next/image"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
-import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { signOut } from "next-auth/react"
 import useSWR from "swr"
@@ -60,12 +59,24 @@ const swrOptions = {
   refreshInterval: 0, // No auto refresh
 }
 
+const demoProfile = {
+  name: "Alex Morgan",
+  email: "alex.morgan@example.com",
+  phone: "",
+  address: "",
+  memberSince: "Today",
+  tierColor: "yellow",
+  currentTier: "Iconic",
+  totalSpent: 0,
+  nextTier: "Prestige Collection",
+  tierProgress: 0,
+}
+
 export default function AccountPage() {
-  const { data: session, status } = useSession()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("overview")
   const { toast } = useToast()
-  const { refreshUser } = useAuth()
+  const { isAuthenticated, isDemoUser, isLoading: loadingAuth, logout, refreshUser } = useAuth()
 
   // Settings state
   const [formData, setFormData] = useState({
@@ -89,15 +100,17 @@ export default function AccountPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (!loadingAuth && !isAuthenticated) {
       router.replace("/auth/login")
     }
-  }, [status, router])
+  }, [isAuthenticated, loadingAuth, router])
 
-  const { data: profile, isLoading: loadingProfile } = useSWR("/api/account", fetcher, swrOptions)
-  const { data: orders, isLoading: loadingOrders } = useSWR("/api/orders", fetcher, swrOptions)
-  const { data: wishlist, isLoading: loadingWishlist } = useSWR("/api/wishlist", fetcher, swrOptions)
-  const { data: subscriptionData, isLoading: loadingSubscription } = useSWR("/api/subscription", fetcher, swrOptions)
+  const { data: apiProfile, isLoading: loadingProfile } = useSWR(isDemoUser || !isAuthenticated ? null : "/api/account", fetcher, swrOptions)
+  const { data: orders, isLoading: loadingOrders } = useSWR(isDemoUser || !isAuthenticated ? null : "/api/orders", fetcher, swrOptions)
+  const { data: wishlist, isLoading: loadingWishlist } = useSWR(isDemoUser || !isAuthenticated ? null : "/api/wishlist", fetcher, swrOptions)
+  const { data: subscriptionData, isLoading: loadingSubscription } = useSWR(isDemoUser || !isAuthenticated ? null : "/api/subscription", fetcher, swrOptions)
+
+  const profile = apiProfile || (isDemoUser ? demoProfile : null)
 
   // Provide fallback data for orders and wishlist
   const ordersData = orders || []
@@ -227,7 +240,7 @@ export default function AccountPage() {
   const confirmCancelSubscription = async () => {
     setIsUpdatingSubscription(true)
     setShowCancelDialog(false)
-    
+
     try {
       const response = await fetch("/api/subscription", {
         method: "DELETE"
@@ -257,7 +270,7 @@ export default function AccountPage() {
       // In a real application, this would integrate with a payment processor
       // For now, we'll simulate the process
       toast({ title: "Redirecting to payment method update..." })
-      
+
       // Simulate a delay for the payment update process
       setTimeout(() => {
         toast({ title: "Payment method updated successfully!" })
@@ -269,17 +282,17 @@ export default function AccountPage() {
     }
   }
 
-  if (loadingProfile || loadingOrders || loadingWishlist || loadingSubscription) {
+  if (loadingAuth || loadingProfile || loadingOrders || loadingWishlist || loadingSubscription) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-500">Loading account...</div>
     )
   }
-  if (!profile) {
-    return <div className="min-h-screen flex items-center justify-center text-gray-500">Account not found.</div>
+  if (!isAuthenticated) {
+    return null
   }
 
-  if (status === "unauthenticated") {
-    return null
+  if (!profile) {
+    return <div className="min-h-screen flex items-center justify-center text-gray-500">Account not found.</div>
   }
 
   const getTierIcon = (tier: string) => {
@@ -337,7 +350,7 @@ export default function AccountPage() {
                     </div>
                   </div>
                   <Button
-                    onClick={() => signOut({ callbackUrl: "/" })}
+                    onClick={logout}
                     className="mt-6 sm:mt-0 bg-yellow-500 text-black hover:bg-yellow-600 transition"
                   >
                     <LogOut className="mr-2" /> Logout
@@ -419,13 +432,12 @@ export default function AccountPage() {
                                 <div className="text-right">
                                   <div className="font-medium text-gray-900 mb-2">{order.total}</div>
                                   <Badge
-                                    className={`${
-                                      order.statusColor === "green"
+                                    className={`${order.statusColor === "green"
                                         ? "bg-green-100 text-green-800"
                                         : order.statusColor === "blue"
                                           ? "bg-blue-100 text-blue-800"
                                           : "bg-yellow-100 text-yellow-800"
-                                    }`}
+                                      }`}
                                   >
                                     {order.status}
                                   </Badge>
@@ -489,16 +501,16 @@ export default function AccountPage() {
                         <CardTitle>Quick Actions</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           className="w-full justify-start bg-transparent"
                           onClick={() => setActiveTab("orders")}
                         >
                           <Eye className="h-4 w-4 mr-2" />
                           Track Orders
                         </Button>
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           className="w-full justify-start bg-transparent"
                           onClick={() => setActiveTab("wishlist")}
                         >
@@ -529,13 +541,12 @@ export default function AccountPage() {
                               </div>
                               <div className="flex items-center gap-3 mt-3 sm:mt-0">
                                 <Badge
-                                  className={`${
-                                    order.statusColor === "green"
+                                  className={`${order.statusColor === "green"
                                       ? "bg-green-100 text-green-800"
                                       : order.statusColor === "blue"
                                         ? "bg-blue-100 text-blue-800"
                                         : "bg-yellow-100 text-yellow-800"
-                                  }`}
+                                    }`}
                                 >
                                   {order.status}
                                 </Badge>
@@ -547,16 +558,16 @@ export default function AccountPage() {
                               <div className="text-gray-900">{order.items.join(", ")}</div>
                             </div>
                             <div className="flex flex-col sm:flex-row gap-3">
-                              <Button 
-                                variant="outline" 
+                              <Button
+                                variant="outline"
                                 size="sm"
                                 onClick={() => toast({ title: `Order details for ${order.id}`, description: `Status: ${order.status}, Total: ${order.total}` })}
                               >
                                 <Eye className="h-4 w-4 mr-2" />
                                 View Details
                               </Button>
-                              <Button 
-                                variant="outline" 
+                              <Button
+                                variant="outline"
                                 size="sm"
                                 onClick={() => {
                                   // Generate receipt data
@@ -650,8 +661,8 @@ export default function AccountPage() {
                               >
                                 Add to Cart
                               </Button>
-                              <Button 
-                                variant="outline" 
+                              <Button
+                                variant="outline"
                                 size="sm"
                                 onClick={async () => {
                                   try {
@@ -712,9 +723,9 @@ export default function AccountPage() {
                             {subscription?.tier || profile.currentTier || "No Active Subscription"}
                           </h3>
                           <p className="text-gray-600">
-                            {subscription?.tier === "Ultra-Exclusive" ? "$299/month" : 
-                             subscription?.tier === "Prestige Collection" ? "$199/month" : 
-                             "Free"}
+                            {subscription?.tier === "Ultra-Exclusive" ? "$299/month" :
+                              subscription?.tier === "Prestige Collection" ? "$199/month" :
+                                "Free"}
                           </p>
                           {subscription && (
                             <p className="text-sm text-gray-500 mt-1">
@@ -751,7 +762,7 @@ export default function AccountPage() {
                           <div className="flex justify-between">
                             <span className="text-gray-600">Next billing date:</span>
                             <span className="text-gray-900">
-                              {subscription?.renewedAt 
+                              {subscription?.renewedAt
                                 ? new Date(new Date(subscription.renewedAt).getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()
                                 : "N/A"
                               }
@@ -764,9 +775,9 @@ export default function AccountPage() {
                           <div className="flex justify-between">
                             <span className="text-gray-600">Amount:</span>
                             <span className="text-gray-900">
-                              {subscription?.tier === "Ultra-Exclusive" ? "$299.00" : 
-                               subscription?.tier === "Prestige Collection" ? "$199.00" : 
-                               "Free"}
+                              {subscription?.tier === "Ultra-Exclusive" ? "$299.00" :
+                                subscription?.tier === "Prestige Collection" ? "$199.00" :
+                                  "Free"}
                             </span>
                           </div>
                         </div>
@@ -977,7 +988,7 @@ export default function AccountPage() {
               Are you sure you want to cancel your <span className="font-semibold">{profile?.currentTier}</span> subscription?
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <h4 className="font-medium text-red-800 mb-2">What happens when you cancel:</h4>
@@ -1008,7 +1019,7 @@ export default function AccountPage() {
                 )}
               </ul>
             </div>
-            
+
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
               <h4 className="font-medium text-yellow-800 mb-2">You can always reactivate:</h4>
               <p className="text-sm text-yellow-700">
@@ -1016,17 +1027,17 @@ export default function AccountPage() {
               </p>
             </div>
           </div>
-          
+
           <DialogFooter className="gap-3">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => setShowCancelDialog(false)}
               className="flex-1"
             >
               Keep Subscription
             </Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={confirmCancelSubscription}
               disabled={isUpdatingSubscription}
               className="flex-1"

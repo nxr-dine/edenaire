@@ -14,17 +14,18 @@ import Footer from "@/components/footer"
 import { useAuth } from "@/contexts/auth-context"
 import { getSubscriptionBenefits, getTierDisplayName, getTierBadgeColor } from "@/lib/subscription-utils"
 import useSWR from "swr"
+import { getDemoCart, updateDemoCartItem, removeDemoCartItem, addDemoWishlistItem } from "@/lib/demo-store"
 
-const fetcher = (url: string) => fetch(url).then(res => res.json())
+const fetcher = (url: string) => url === "demo-cart" ? getDemoCart() : fetch(url).then(res => res.json())
 
 export default function CartPage() {
   const [promoCode, setPromoCode] = useState("")
-  const { user } = useAuth()
-  const { data: cart, isLoading, mutate } = useSWR("/api/cart", fetcher)
-  
+  const { user, isAuthenticated, isDemoUser } = useAuth()
+  const { data: cart, isLoading, mutate } = useSWR(isDemoUser ? "demo-cart" : isAuthenticated ? "/api/cart" : null, fetcher)
+
   const userTier = user?.tier || "iconic"
   const benefits = getSubscriptionBenefits(userTier)
-  
+
   const cartItems = (cart?.items || []).map((item: any) => ({
     ...item,
     price: item.price || 0,
@@ -35,6 +36,11 @@ export default function CartPage() {
   }))
 
   const updateQuantity = async (id: string, newQuantity: number) => {
+    if (isDemoUser) {
+      await mutate(updateDemoCartItem(id, newQuantity), false)
+      return
+    }
+
     if (newQuantity === 0) {
       await removeItem(id)
       return
@@ -48,6 +54,11 @@ export default function CartPage() {
   }
 
   const removeItem = async (id: string) => {
+    if (isDemoUser) {
+      await mutate(removeDemoCartItem(id), false)
+      return
+    }
+
     await fetch("/api/cart/item", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
@@ -57,7 +68,10 @@ export default function CartPage() {
   }
 
   const moveToWishlist = async (id: string) => {
-    // Optionally, implement move to wishlist
+    if (isDemoUser) {
+      const item = cart?.items?.find((cartItem: any) => cartItem.id === id)
+      if (item) addDemoWishlistItem(item)
+    }
     await removeItem(id)
   }
 
@@ -65,14 +79,14 @@ export default function CartPage() {
   const discountedTotal = cart?.discountedTotal || subtotal
   const discountAmount = cart?.discountAmount || 0
   const discountPercentage = cart?.discountPercentage || 0
-  
+
   const savings = cartItems.reduce((sum: number, item: any) => {
     if (item.originalPrice) {
       return sum + (item.originalPrice - item.price) * item.quantity
     }
     return sum
   }, 0) + discountAmount
-  
+
   const shipping = 0 // Free shipping
   const tax = discountedTotal * 0.08 // 8% tax
   const total = discountedTotal + shipping + tax

@@ -17,11 +17,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Search, ShoppingBag, User, Menu, X, Heart, LogIn, LogOut, Settings, Package } from "lucide-react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
 import useSWR from "swr"
+import { getDemoCart } from "@/lib/demo-store"
 
-const fetcher = (url: string) => fetch(url).then(res => res.json())
+const fetcher = (url: string) => url === "demo-cart" ? getDemoCart() : fetch(url).then(res => res.json())
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -30,10 +32,11 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState("")
   const mobileMenuRef = useRef<HTMLDivElement>(null)
   const searchRef = useRef<HTMLDivElement>(null)
-  const { user, isAuthenticated, logout } = useAuth()
+  const { user, isAuthenticated, isDemoUser, logout } = useAuth()
+  const pathname = usePathname()
 
   // Fetch cart data for dynamic cart count
-  const { data: cart } = useSWR(isAuthenticated ? "/api/cart" : null, fetcher)
+  const { data: cart } = useSWR(isAuthenticated ? isDemoUser ? "demo-cart" : "/api/cart" : null, fetcher)
   const cartItemCount = cart?.items?.length || 0
 
   useEffect(() => {
@@ -65,14 +68,6 @@ export default function Header() {
     }
   }, [isMobileMenuOpen, isSearchOpen])
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId)
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" })
-      setIsMobileMenuOpen(false)
-    }
-  }
-
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
@@ -91,8 +86,8 @@ export default function Header() {
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        isScrolled 
-          ? "bg-white/95 backdrop-blur-md shadow-lg" 
+        isScrolled
+          ? "bg-white/95 backdrop-blur-md shadow-lg"
           : "bg-black/20 backdrop-blur-sm"
       )}
     >
@@ -116,8 +111,8 @@ export default function Header() {
               href="/"
               className={cn(
                 "transition-colors font-medium text-sm uppercase tracking-wider",
-                isScrolled 
-                  ? "text-gray-700 hover:text-yellow-600" 
+                isScrolled
+                  ? "text-gray-700 hover:text-yellow-600"
                   : "text-white/90 hover:text-yellow-400"
               )}
             >
@@ -127,30 +122,30 @@ export default function Header() {
               href="/shop"
               className={cn(
                 "transition-colors font-medium text-sm uppercase tracking-wider",
-                isScrolled 
-                  ? "text-gray-700 hover:text-yellow-600" 
+                isScrolled
+                  ? "text-gray-700 hover:text-yellow-600"
                   : "text-white/90 hover:text-yellow-400"
               )}
             >
               Collections
             </Link>
-            <button
-              onClick={() => scrollToSection("about")}
+            <Link
+              href={pathname === "/" ? "/#about" : "/about"}
               className={cn(
                 "transition-colors font-medium text-sm uppercase tracking-wider cursor-pointer",
-                isScrolled 
-                  ? "text-gray-700 hover:text-yellow-600" 
+                isScrolled
+                  ? "text-gray-700 hover:text-yellow-600"
                   : "text-white/90 hover:text-yellow-400"
               )}
             >
               About
-            </button>
+            </Link>
             <Link
               href="/contact"
               className={cn(
                 "transition-colors font-medium text-sm uppercase tracking-wider",
-                isScrolled 
-                  ? "text-gray-700 hover:text-yellow-600" 
+                isScrolled
+                  ? "text-gray-700 hover:text-yellow-600"
                   : "text-white/90 hover:text-yellow-400"
               )}
             >
@@ -166,8 +161,8 @@ export default function Header() {
                 size="sm"
                 className={cn(
                   "p-2 transition-colors",
-                  isScrolled 
-                    ? "text-gray-700 hover:text-yellow-600" 
+                  isScrolled
+                    ? "text-gray-700 hover:text-yellow-600"
                     : "text-white/90 hover:text-yellow-400"
                 )}
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
@@ -203,13 +198,13 @@ export default function Header() {
             </div>
 
             <Link href="/wishlist">
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 className={cn(
                   "p-2 transition-colors",
-                  isScrolled 
-                    ? "text-gray-700 hover:text-yellow-600" 
+                  isScrolled
+                    ? "text-gray-700 hover:text-yellow-600"
                     : "text-white/90 hover:text-yellow-400"
                 )}
               >
@@ -221,13 +216,13 @@ export default function Header() {
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     className={cn(
                       "p-1 transition-colors",
-                      isScrolled 
-                        ? "text-gray-700 hover:text-yellow-600" 
+                      isScrolled
+                        ? "text-gray-700 hover:text-yellow-600"
                         : "text-white/90 hover:text-yellow-400"
                     )}
                   >
@@ -278,8 +273,8 @@ export default function Header() {
                   size="sm"
                   className={cn(
                     "p-2 flex items-center gap-2 transition-colors",
-                    isScrolled 
-                      ? "text-gray-700 hover:text-yellow-600" 
+                    isScrolled
+                      ? "text-gray-700 hover:text-yellow-600"
                       : "text-white/90 hover:text-yellow-400"
                   )}
                 >
@@ -290,13 +285,13 @@ export default function Header() {
             )}
 
             <Link href="/cart">
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 className={cn(
                   "relative p-2 transition-colors",
-                  isScrolled 
-                    ? "text-gray-700 hover:text-yellow-600" 
+                  isScrolled
+                    ? "text-gray-700 hover:text-yellow-600"
                     : "text-white/90 hover:text-yellow-400"
                 )}
               >
@@ -316,8 +311,8 @@ export default function Header() {
             size="sm"
             className={cn(
               "lg:hidden p-2 transition-colors",
-              isScrolled 
-                ? "text-gray-700" 
+              isScrolled
+                ? "text-gray-700"
                 : "text-white/90"
             )}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -364,12 +359,13 @@ export default function Header() {
               >
                 Collections
               </Link>
-              <button
-                onClick={() => scrollToSection("about")}
+              <Link
+                href={pathname === "/" ? "/#about" : "/about"}
                 className="text-gray-700 hover:text-yellow-600 transition-colors font-medium px-4 py-2 text-sm uppercase tracking-wider text-left"
+                onClick={() => setIsMobileMenuOpen(false)}
               >
                 About
-              </button>
+              </Link>
               <Link
                 href="/contact"
                 className="text-gray-700 hover:text-yellow-600 transition-colors font-medium px-4 py-2 text-sm uppercase tracking-wider"

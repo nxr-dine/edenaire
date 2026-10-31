@@ -11,11 +11,16 @@ import Header from "@/components/header"
 import Footer from "@/components/footer"
 import useSWR, { mutate } from "swr"
 import { useParams, useRouter } from "next/navigation"
-import { useSession } from "next-auth/react"
 import { useToast } from "@/components/ui/use-toast"
 import { fallbackProducts } from "@/lib/product-catalog"
+import { useAuth } from "@/contexts/auth-context"
+import { addDemoCartItem, addDemoWishlistItem, getDemoWishlist, removeDemoWishlistItem } from "@/lib/demo-store"
 
 const fetcher = async (url: string) => {
+  if (url === "demo-wishlist") {
+    return { products: getDemoWishlist() }
+  }
+
   const response = await fetch(url)
   if (!response.ok) {
     throw new Error("Product not found")
@@ -26,7 +31,7 @@ const fetcher = async (url: string) => {
 export default function ProductPage() {
   const params = useParams()
   const router = useRouter()
-  const { data: session, status } = useSession()
+  const { isAuthenticated, isDemoUser } = useAuth()
   const { toast } = useToast()
   const productId = typeof params?.id === "string" ? params.id : undefined
   const fallbackProduct = fallbackProducts.find((item) => item.id === productId)
@@ -41,14 +46,14 @@ export default function ProductPage() {
 
   // Fetch user's wishlist to check if product is already in it
   const { data: wishlist } = useSWR(
-    session?.user?.email ? '/api/wishlist' : null, 
+    isDemoUser ? "demo-wishlist" : isAuthenticated ? "/api/wishlist" : null,
     fetcher
   )
 
   const isInWishlist = wishlist?.products?.some((item: any) => item.id === productId)
 
   const handleAddToCart = async () => {
-    if (!session) {
+    if (!isAuthenticated) {
       toast({
         title: "Authentication Required",
         description: "Please log in to add items to cart",
@@ -62,6 +67,16 @@ export default function ProductPage() {
 
     setIsAddingToCart(true)
     try {
+      if (isDemoUser) {
+        addDemoCartItem(product, quantity)
+        mutate("demo-cart")
+        toast({
+          title: "Success",
+          description: `Added ${quantity} ${quantity === 1 ? "item" : "items"} to cart`,
+        })
+        return
+      }
+
       const response = await fetch('/api/cart', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -98,7 +113,7 @@ export default function ProductPage() {
   }
 
   const handleWishlistToggle = async () => {
-    if (!session) {
+    if (!isAuthenticated) {
       toast({
         title: "Authentication Required",
         description: "Please log in to manage wishlist",
@@ -112,6 +127,20 @@ export default function ProductPage() {
 
     setIsAddingToWishlist(true)
     try {
+      if (isDemoUser) {
+        if (isInWishlist) {
+          removeDemoWishlistItem(product.id)
+        } else {
+          addDemoWishlistItem(product)
+        }
+        mutate("demo-wishlist")
+        toast({
+          title: "Success",
+          description: isInWishlist ? "Removed from wishlist" : "Added to wishlist",
+        })
+        return
+      }
+
       const method = isInWishlist ? 'DELETE' : 'POST'
       const response = await fetch('/api/wishlist', {
         method,
@@ -280,7 +309,7 @@ export default function ProductPage() {
                     +
                   </button>
                 </div>
-                <Button 
+                <Button
                   onClick={handleAddToCart}
                   disabled={isAddingToCart}
                   className="flex-1 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black py-3 text-lg disabled:opacity-50"
@@ -291,8 +320,8 @@ export default function ProductPage() {
               </div>
 
               <div className="flex gap-3">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className={`flex-1 bg-transparent ${isInWishlist ? 'border-red-300 text-red-600 hover:bg-red-50' : ''}`}
                   onClick={handleWishlistToggle}
                   disabled={isAddingToWishlist}
@@ -300,8 +329,8 @@ export default function ProductPage() {
                   <Heart className={`mr-2 h-5 w-5 ${isInWishlist ? 'fill-current' : ''}`} />
                   {isAddingToWishlist ? 'Updating...' : (isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist')}
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="flex-1 bg-transparent"
                   onClick={handleShare}
                 >

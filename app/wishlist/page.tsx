@@ -13,15 +13,18 @@ import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { ClientOnly } from "@/components/client-only"
 import useSWR from "swr"
+import { useAuth } from "@/contexts/auth-context"
+import { getDemoWishlist } from "@/lib/demo-store"
 
-const fetcher = (url: string) => fetch(url).then(res => res.json())
+const fetcher = (url: string) => url === "demo-wishlist" ? { products: getDemoWishlist() } : fetch(url).then(res => res.json())
 
 export default function WishlistPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [sortBy, setSortBy] = useState("date-added")
   const [filterTier, setFilterTier] = useState("all")
+  const { isAuthenticated, isDemoUser } = useAuth()
 
-  const { data: wishlist, isLoading } = useSWR("/api/wishlist", fetcher)
+  const { data: wishlist, isLoading } = useSWR(isDemoUser ? "demo-wishlist" : isAuthenticated ? "/api/wishlist" : null, fetcher)
   const wishlistItems = wishlist?.products || []
 
   const filteredItems = wishlistItems && Array.isArray(wishlistItems) ? wishlistItems.filter((item: any) => {
@@ -160,14 +163,12 @@ export default function WishlistPage() {
                   {filteredItems && Array.isArray(filteredItems) && filteredItems.map((item: any) => (
                     <Card
                       key={item.id}
-                      className={`group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 ${
-                        viewMode === "list" ? "flex flex-col sm:flex-row" : ""
-                      }`}
+                      className={`group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 ${viewMode === "list" ? "flex flex-col sm:flex-row" : ""
+                        }`}
                     >
                       <div
-                        className={`relative overflow-hidden ${
-                          viewMode === "list" ? "w-full sm:w-48 h-48 sm:h-32 flex-shrink-0" : "h-64 sm:h-80"
-                        }`}
+                        className={`relative overflow-hidden ${viewMode === "list" ? "w-full sm:w-48 h-48 sm:h-32 flex-shrink-0" : "h-64 sm:h-80"
+                          }`}
                       >
                         <Image
                           src={item.image || "/placeholder.svg"}

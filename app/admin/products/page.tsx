@@ -391,6 +391,7 @@ export default function AdminProducts() {
           </CardContent>
         </Card>
       </div>
+      </div>
     </ClientOnly>
   )
 }

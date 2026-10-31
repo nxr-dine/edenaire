@@ -4,7 +4,20 @@ import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Quote, ChevronLeft, ChevronRight } from "lucide-react"
-import Image from "next/image"
+
+function TestimonialAvatar({ name, size }: { name: string; size: "small" | "large" }) {
+  const initial = name.charAt(0).toUpperCase()
+  const dimensions = size === "large" ? "w-20 h-20 text-3xl mr-6" : "w-16 h-16 text-2xl mr-4"
+
+  return (
+    <div
+      className={`${dimensions} rounded-full ring-2 ring-yellow-400/50 bg-gradient-to-br from-yellow-300 to-yellow-600 flex items-center justify-center text-gray-900 font-medium`}
+      aria-label={`${name} profile picture`}
+    >
+      {initial}
+    </div>
+  )
+}
 
 export default function TestimonialCarousel() {
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -14,7 +27,6 @@ export default function TestimonialCarousel() {
       id: 1,
       name: "Isabella Rothschild",
       title: "Art Collector",
-      image: "/placeholder.svg?height=80&width=80",
       quote:
         "Edenaire doesn't just create jewelry; they craft dreams into reality. Each piece I own tells a story of unparalleled artistry.",
       location: "Geneva",
@@ -24,7 +36,6 @@ export default function TestimonialCarousel() {
       id: 2,
       name: "Marcus Wellington",
       title: "Investment Banker",
-      image: "/placeholder.svg?height=80&width=80",
       quote:
         "The attention to detail and craftsmanship is extraordinary. My wife's anniversary gift from Edenaire exceeded all expectations.",
       location: "London",
@@ -34,7 +45,6 @@ export default function TestimonialCarousel() {
       id: 3,
       name: "Sophia Chen",
       title: "Fashion Designer",
-      image: "/placeholder.svg?height=80&width=80",
       quote:
         "As someone who appreciates fine craftsmanship, Edenaire's work is simply incomparable. True luxury in every detail.",
       location: "New York",
@@ -44,7 +54,6 @@ export default function TestimonialCarousel() {
       id: 4,
       name: "Alessandro Medici",
       title: "Art Patron",
-      image: "/placeholder.svg?height=80&width=80",
       quote:
         "Edenaire understands that jewelry is art. Each piece in my collection represents the pinnacle of luxury and sophistication.",
       location: "Milan",
@@ -54,7 +63,6 @@ export default function TestimonialCarousel() {
       id: 5,
       name: "Victoria Ashworth",
       title: "Philanthropist",
-      image: "/placeholder.svg?height=80&width=80",
       quote:
         "The personal service and attention to detail is remarkable. Edenaire creates pieces that become family treasures.",
       location: "Paris",
@@ -101,17 +109,10 @@ export default function TestimonialCarousel() {
               <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
                 <CardContent className="p-8">
                   <div className="flex items-center mb-6">
-                    <div className="relative w-16 h-16 rounded-full overflow-hidden mr-4">
-                      <Image
-                        src={
-                          testimonials[(currentSlide - 1 + testimonials.length) % testimonials.length].image ||
-                          "/placeholder.svg"
-                        }
-                        alt={testimonials[(currentSlide - 1 + testimonials.length) % testimonials.length].name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
+                    <TestimonialAvatar
+                      name={testimonials[(currentSlide - 1 + testimonials.length) % testimonials.length].name}
+                      size="small"
+                    />
                     <div>
                       <h4 className="text-white font-medium">
                         {testimonials[(currentSlide - 1 + testimonials.length) % testimonials.length].name}
@@ -134,14 +135,7 @@ export default function TestimonialCarousel() {
               <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-yellow-400/30 backdrop-blur-sm shadow-2xl">
                 <CardContent className="p-12">
                   <div className="flex items-center mb-8">
-                    <div className="relative w-20 h-20 rounded-full overflow-hidden mr-6 ring-2 ring-yellow-400/50">
-                      <Image
-                        src={testimonials[currentSlide].image || "/placeholder.svg"}
-                        alt={testimonials[currentSlide].name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
+                    <TestimonialAvatar name={testimonials[currentSlide].name} size="large" />
                     <div>
                       <h4 className="text-white text-xl font-medium mb-1">{testimonials[currentSlide].name}</h4>
                       <p className="text-gray-400 mb-2">{testimonials[currentSlide].title}</p>
@@ -165,14 +159,10 @@ export default function TestimonialCarousel() {
               <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
                 <CardContent className="p-8">
                   <div className="flex items-center mb-6">
-                    <div className="relative w-16 h-16 rounded-full overflow-hidden mr-4">
-                      <Image
-                        src={testimonials[(currentSlide + 1) % testimonials.length].image || "/placeholder.svg"}
-                        alt={testimonials[(currentSlide + 1) % testimonials.length].name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
+                    <TestimonialAvatar
+                      name={testimonials[(currentSlide + 1) % testimonials.length].name}
+                      size="small"
+                    />
                     <div>
                       <h4 className="text-white font-medium">
                         {testimonials[(currentSlide + 1) % testimonials.length].name}

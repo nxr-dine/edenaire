@@ -1,6 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import Image from "next/image"
 import "./globals.css"
 import { Providers } from "@/components/providers"
 
@@ -22,11 +23,13 @@ export default function RootLayout({
       <body className={inter.className + " relative min-h-screen"}>
         {/* Global Background Image */}
         <div className="fixed inset-0 -z-10">
-          <img
+          <Image
             src="/background.jpg"
             alt="Background"
-            className="w-full h-full object-cover object-center select-none pointer-events-none"
-            draggable="false"
+            fill
+            sizes="100vw"
+            priority
+            className="object-cover object-center select-none pointer-events-none"
           />
           <div className="absolute inset-0 bg-black/60" />
         </div>

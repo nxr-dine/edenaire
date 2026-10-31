@@ -13,16 +13,28 @@ import useSWR, { mutate } from "swr"
 import { useParams, useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { useToast } from "@/components/ui/use-toast"
+import { fallbackProducts } from "@/lib/product-catalog"
 
-const fetcher = (url: string) => fetch(url).then(res => res.json())
+const fetcher = async (url: string) => {
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error("Product not found")
+  }
+  return response.json()
+}
 
 export default function ProductPage() {
   const params = useParams()
   const router = useRouter()
   const { data: session, status } = useSession()
   const { toast } = useToast()
-  const productId = params?.id
-  const { data: product, isLoading } = useSWR(productId ? `/api/products/${productId}` : null, fetcher)
+  const productId = typeof params?.id === "string" ? params.id : undefined
+  const fallbackProduct = fallbackProducts.find((item) => item.id === productId)
+  const { data: product, isLoading } = useSWR(
+    productId && !fallbackProduct ? `/api/products/${productId}` : null,
+    fetcher,
+    { fallbackData: fallbackProduct },
+  )
   const [quantity, setQuantity] = useState(1)
   const [isAddingToCart, setIsAddingToCart] = useState(false)
   const [isAddingToWishlist, setIsAddingToWishlist] = useState(false)

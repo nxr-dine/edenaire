@@ -120,9 +120,10 @@ export default function SubscriptionPage() {
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
-            src="/placeholder.svg?height=1080&width=1920"
+            src="/tiers-hero.jpg"
             alt="Luxury Subscription Background"
             fill
+            sizes="100vw"
             className="object-cover"
             priority
           />

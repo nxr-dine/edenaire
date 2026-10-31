@@ -12,6 +12,7 @@ import Footer from "@/components/footer"
 import TestimonialCarousel from "@/components/testimonial-carousel"
 import { ClientOnly } from "@/components/client-only"
 import useSWR from "swr"
+import { fallbackProducts } from "@/lib/product-catalog"
 
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
@@ -89,12 +90,20 @@ export default function HomePage() {
     return () => clearInterval(interval)
   }, [heroImages.length])
 
-  const { data: products, isLoading } = useSWR("/api/products", fetcher)
+  const { data: products, isLoading } = useSWR("/api/products", fetcher, {
+    fallbackData: fallbackProducts,
+    revalidateOnFocus: false,
+    shouldRetryOnError: false,
+    errorRetryCount: 0,
+    dedupingInterval: 60000,
+  })
 
-  // Filter for featured products (e.g., those with a badge or featured property)
-  const featuredProducts = products && Array.isArray(products) ? products.filter(
-    (product: any) => product && (product.badge || product.featured)
-  ).slice(0, 4) : []
+  const availableProducts =
+    products && Array.isArray(products) && products.length > 0 ? products : fallbackProducts
+  const hasFeaturedProducts = availableProducts.some((product: any) => product.badge || product.featured)
+  const featuredProducts = (hasFeaturedProducts ? availableProducts : fallbackProducts)
+    .filter((product: any) => product && (product.badge || product.featured))
+    .slice(0, 4)
 
   const getTierColor = (tier: string) => {
     switch (tier) {
@@ -130,6 +139,7 @@ export default function HomePage() {
               alt={`Hero ${index + 1}`}
               fill
               className="object-cover"
+              sizes="100vw"
               priority={index === 0}
             />
           </div>
@@ -218,7 +228,7 @@ export default function HomePage() {
                         <Button size="sm" variant="secondary" className="w-10 h-10 p-0">
                           <Heart className="h-4 w-4" />
                         </Button>
-                        <Link href={`/product/${product.slug}`}>
+                        <Link href={`/product/${product.id}`}>
                           <Button size="sm" variant="secondary" className="w-10 h-10 p-0">
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -414,14 +424,14 @@ export default function HomePage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-4">
                   <Image
-                    src="/placeholder.svg?height=300&width=300&text=Artisan+Crafting"
+                    src="/about 1.jpg?height=300&width=300&text=Artisan+Crafting"
                     alt="Master artisan at work"
                     width={300}
                     height={300}
                     className="rounded-lg shadow-lg object-cover w-full h-48"
                   />
                   <Image
-                    src="/placeholder.svg?height=200&width=300&text=Luxury+Workshop"
+                    src="/about 2.jpg?height=200&width=300&text=Luxury+Workshop"
                     alt="Luxury workshop"
                     width={300}
                     height={200}
@@ -430,14 +440,14 @@ export default function HomePage() {
                 </div>
                 <div className="space-y-4 mt-8">
                   <Image
-                    src="/placeholder.svg?height=200&width=300&text=Diamond+Selection"
+                    src="/about 3.jpg?height=200&width=300&text=Diamond+Selection"
                     alt="Diamond selection process"
                     width={300}
                     height={200}
                     className="rounded-lg shadow-lg object-cover w-full h-32"
                   />
                   <Image
-                    src="/placeholder.svg?height=300&width=300&text=Finished+Jewelry"
+                    src="/about 4.jpg?height=300&width=300&text=Finished+Jewelry"
                     alt="Finished jewelry pieces"
                     width={300}
                     height={300}

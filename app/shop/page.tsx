@@ -15,6 +15,7 @@ import { ClientOnly } from "@/components/client-only"
 import { useAuth } from "@/contexts/auth-context"
 import { calculateDiscountedPrice, getSubscriptionBenefits, getTierBadgeColor, getTierDisplayName } from "@/lib/subscription-utils"
 import useSWR from "swr"
+import { fallbackProducts } from "@/lib/product-catalog"
 
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
@@ -23,11 +24,19 @@ export default function ShopPage() {
   const [priceRange, setPriceRange] = useState([0, 100000])
   const { user } = useAuth()
 
-  const { data: products, isLoading } = useSWR("/api/products", fetcher)
+  const { data: products, isLoading } = useSWR("/api/products", fetcher, {
+    fallbackData: fallbackProducts,
+    revalidateOnFocus: false,
+    shouldRetryOnError: false,
+    errorRetryCount: 0,
+    dedupingInterval: 60000,
+  })
 
-  const filteredProducts = products && Array.isArray(products) ? products.filter(
+  const availableProducts =
+    products && Array.isArray(products) && products.length > 0 ? products : fallbackProducts
+  const filteredProducts = availableProducts.filter(
     (product: any) => product && product.price >= priceRange[0] && product.price <= priceRange[1],
-  ) : []
+  )
 
   const userTier = user?.tier || "iconic"
   const benefits = getSubscriptionBenefits(userTier)
@@ -53,6 +62,13 @@ export default function ShopPage() {
         {/* Hero Section */}
         <section className="relative h-64 flex items-center justify-center mt-20">
           <div className="absolute inset-0 z-0">
+            <Image
+              src="/collections.jpg"
+              alt="Edenaire jewelry collections"
+              fill
+              sizes="100vw"
+              className="object-cover"
+            />
             <div className="absolute inset-0 bg-black/40" />
           </div>
 
@@ -143,7 +159,7 @@ export default function ShopPage() {
               {/* Toolbar */}
               <div className="flex justify-between items-center mb-8">
                 <p className="text-gray-600">
-                  Showing {filteredProducts && Array.isArray(filteredProducts) ? filteredProducts.length : 0} of {products && Array.isArray(products) ? products.length : 0} products
+                  Showing {filteredProducts.length} of {availableProducts.length} products
                 </p>
                 <div className="flex items-center gap-2">
                   <Button
@@ -184,6 +200,7 @@ export default function ShopPage() {
                           src={product.image || "/placeholder.svg"}
                           alt={product.name}
                           fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                           className="object-cover group-hover:scale-110 transition-transform duration-700"
                         />
                         <div className="absolute top-4 left-4">

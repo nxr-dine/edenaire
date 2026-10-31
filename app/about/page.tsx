@@ -79,7 +79,7 @@ export default function AboutPage() {
       {/* Hero Section */}
       <section className="relative h-96 flex items-center justify-center mt-20">
         <div className="absolute inset-0 z-0">
-          <Image src="/placeholder.svg?height=600&width=1920" alt="Edenaire Atelier" fill className="object-cover" />
+          <Image src="/about-hero.png" alt="Edenaire Atelier" fill className="object-cover" />
           <div className="absolute inset-0 bg-black/40" />
         </div>
 
@@ -195,10 +195,40 @@ export default function AboutPage() {
             </div>
             <div className="relative h-96 lg:h-[500px]">
               <Image
-                src="/placeholder.svg?height=500&width=600"
+                src="/about 2.jpg"
                 alt="Master Craftsman at Work"
                 fill
                 className="object-cover rounded-lg shadow-2xl"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Atelier Gallery */}
+      <section className="py-24 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-light mb-6 text-gray-900">Inside Our Atelier</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              A glimpse into the spaces and details behind every Edenaire creation
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="relative h-80">
+              <Image
+                src="/about 3.jpg"
+                alt="Edenaire atelier"
+                fill
+                className="object-cover rounded-lg shadow-lg"
+              />
+            </div>
+            <div className="relative h-80">
+              <Image
+                src="/about 4.jpg"
+                alt="Edenaire craftsmanship"
+                fill
+                className="object-cover rounded-lg shadow-lg"
               />
             </div>
           </div>

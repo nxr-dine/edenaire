@@ -118,6 +118,13 @@ export default function ContactPage() {
       {/* Hero Section */}
       <section className="relative h-64 flex items-center justify-center mt-20">
         <div className="absolute inset-0 z-0">
+          <Image
+            src="/contact-us.jpg"
+            alt="Contact Edenaire"
+            fill
+            sizes="100vw"
+            className="object-cover"
+          />
           <div className="absolute inset-0 bg-black/40" />
         </div>
 
